@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <h2>Suivi d'Avancement des Fonctionnalités et Corrections</h2>
+
+  <table class="table table-striped table-bordered mt-4">
+    <thead class="table-dark">
+      <tr>
+        <th>Fonctionnalité</th>
+        <th>Description</th>
+        <th>Demandé par</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <!-- Autres lignes peuvent être ajoutées dynamiquement depuis une boucle -->
+      {% for feature in features %}
+        <tr>
+          <td>{{ feature.nom }}</td>
+          <td>{{ feature.description }}</td>
+          <td>{{ feature.demande_par }}</td>
+          <td>{{ feature.status }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

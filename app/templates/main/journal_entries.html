@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Journal des Actions</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr class="text-center">
+                <th>Date et Heure</th>
+                <th>Utilisateur</th>
+                <th>Type d'Action</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for journal, user_name in entries %}
+            <tr>
+                <td>{{ journal.timestamp.strftime('%H:%M:%S - %d-%m-%y ') }}</td>  <!-- Utilisation de journal.timestamp -->
+                <td>{{ user_name }}</td>
+                <td>{{ journal.action_type }}</td>
+                <td>{{ journal.description }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

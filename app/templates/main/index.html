@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<div class="container my-1">
+  <div class="text-center mb-1">
+    <h1 class="display-4">Veille régelemntaire</h1>
+    <p class="lead">Toutes les notifications qui vous concernent seront affichées ici (en cours)...</p>
+  </div>
+
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle"></i> Les notifications seront bientôt disponibles. Revenez plus tard pour voir les
+    mises à jour.
+  </div>
+
+
+  <div class="text-center my-4">
+    <img src="{{ url_for('static', filename='img/soon.gif') }}" alt="Bientôt disponible" class="img-fluid w-25" />
+  </div>
+
+</div>
+
+{% endblock %}

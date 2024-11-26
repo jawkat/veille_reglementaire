@@ -1,0 +1,121 @@
+:root {
+  --nomai : #575C50;
+  --vert : #797d73;
+
+  --roze: #fc83cd33;
+  --blue: #0b76b488;
+
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+}
+
+.btn-primary {
+background-color: var(--vert) ;
+border: none;
+}
+
+.btn-primary:hover {
+background-color: var(--nomai);
+
+}
+
+.form-control{
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.navbar{
+  background-color: var(--nomai);
+}
+
+.navbar-toggler {
+  border: none;
+}
+.navbar-toggler:focus,
+.btn-close:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+.nav-link {
+  font-weight: 500;
+  position: relative;
+  border: none;
+}
+@media (min-width: 768px) {
+  .nav-link {
+      font-size: 1rem;
+
+  }
+
+  .nav-link::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translatex(-50%);
+      width: 0%;
+      height: 2px;
+      background-color: white;
+      visibility: hidden;
+      transition: 0.3s ease-in-out;
+  }
+}
+
+.nav-link:hover::before,
+.nav-link.active::before {
+  width: 100%;
+  visibility: visible;
+
+
+}
+
+
+
+
+.accordion-button {
+  background-color: var(--nomai);
+  /* Couleur de fond uniforme pour tous les en-têtes */
+  color: #fff;
+  /* Couleur du texte des en-têtes */
+  border: none;
+  /* Supprime les bordures par défaut */
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: var(--nomai);
+  /* Couleur lorsqu'un en-tête est actif (déplié) */
+  color: #fff;
+}
+
+.accordion-body {
+  background-color: #f0f3f4;
+  /* Couleur de fond pour le contenu */
+}
+
+
+@keyframes rotateLogoY {
+  from {
+      transform: rotateY(0deg);
+  }
+  to {
+      transform: rotateY(360deg);
+  }
+}
+
+.logo-rotation {
+  animation: rotateLogoY 20s linear infinite;
+}
+
+.btn {
+  min-width: 100px;
+}
+
+
+
+.table-hover tr:hover {
+  background-color: var(--nomai); /* Couleur de fond lors du survol */
+  cursor: pointer; /* Change le curseur en main */
+}

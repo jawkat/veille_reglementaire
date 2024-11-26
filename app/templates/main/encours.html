@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container my-4">
+  <div class="text-center mb-4">
+    <h1 class="display-4">Information</h1>
+    <p class="lead">cette fonctionnalité est en cours de développement.</p>
+  </div>
+
+  <div class="alert alert-warning">
+    <i class="fas fa-exclamation-circle"></i> Cette fonctionnalité n'est pas encore disponible. Nous y travaillons actuellement.
+  </div>
+
+  <div class="text-center my-4">
+    <img src="{{ url_for('static', filename='img/soon.gif') }}" alt="Bientôt disponible" class="img-fluid w-25" />
+  </div>
+</div>
+{% endblock %}
