@@ -5,7 +5,7 @@
 <style>
     /* Full page background image */
     body {
-        background-image: url('{{ url_for("static", filename="img/NOMAI-slide-01.jpg") }}'); /* Set your desired background image */
+        background-image: url('{{ url_for("static", filename="img/garde.jpg") }}'); /* Set your desired background image */
         background-size: cover;
         transition: background 1s ease; /* Smooth transition effect */
         height: 100vh; /* Full height for body */
@@ -19,7 +19,7 @@
     .login-container {
         max-width: 400px;
         padding: 20px;
-        background: rgba(255, 255, 255, 0.2); /* Light background with transparency */
+        background: rgba(255, 255, 255, 0.6); /* Light background with transparency */
         border-radius: 10px;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         transition: background 0.3s ease; /* Smooth transition */
@@ -30,7 +30,7 @@
 
     /* Increase opacity on hover */
     .login-container:hover {
-        background: rgba(255, 255, 255, 0.8); /* Higher opacity on hover */
+        background: rgba(255, 255, 255, 1); /* Higher opacity on hover */
     }
 
     .logo {
@@ -69,9 +69,9 @@
 <!-- Login Form Container -->
 <div class="login-container justify-content-end">
     <!-- Logo -->
-    <div class="rounded-3 p-2 m-2 text-center">
+    <!-- <div class="rounded-3 p-2 m-2 text-center">
         <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="rounded-circle ms-2 logo-rotation" style="width: 140px; height: 140px;">
-    </div>
+    </div> -->
 
     <!-- Title -->
     <h4 class="login-title">Veuillez Vous Connecter</h4>
@@ -80,11 +80,11 @@
     <form method="POST" action="{{ url_for('auth.login') }}">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.name.label(class_="form-label") }}
+          
             {{ form.name(class_="form-control", placeholder="Nom") }}
         </div>
         <div class="form-group">
-            {{ form.password.label(class_="form-label") }}
+     
             {{ form.password(class_="form-control", placeholder="Mot de passe") }}
         </div>
         <div class="text-center mt-3">
