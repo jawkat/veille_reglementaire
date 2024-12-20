@@ -8,7 +8,11 @@ from flask_login import UserMixin
 from itsdangerous import URLSafeTimedSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
+class RoleUtilisateur(Enum):
+    ADMIN = "Admin"
+    MANAGER = "Manager"
+    RESPONSABLE = "Responsable Veille"
+    COLLABORATEUR = "Collaborateur"
 
 #*************************************************************************************
 class User(db.Model, UserMixin):
@@ -16,7 +20,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    role = db.Column(db.String(10))  # Exemple: "Admin", "Manager", "Collaborateur"
+    role = db.Column(db.Enum(RoleUtilisateur), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=True)
 
@@ -45,19 +49,36 @@ class User(db.Model, UserMixin):
 
 #*******************************************************************************************
 
+
+class Secteur(db.Model):
+    __tablename__ = 'secteur'
+    id = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(100), unique=True, nullable=False)
+    description = db.Column(db.Text, nullable=True)
+    entreprises = db.relationship('Entreprise', backref='secteur', lazy=True)
+    reglementations = db.relationship('ReglementationSecteur', backref='secteur', lazy=True)
+
+
 # Organisation
 
 class Entreprise(db.Model):
     __tablename__ = 'entreprise'
     id = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100), nullable=False)
-    secteur = db.Column(db.String(100), nullable=False)
+    
     description = db.Column(db.Text, nullable=True)
     pays = db.Column(db.String(100), nullable=True)
     utilisateurs = db.relationship('User', backref='entreprise', lazy=True)
     reglementations = db.relationship('EntrepriseReglementation', backref='entreprise', lazy=True)
     notifications = db.relationship('Notification', backref='entreprise', lazy=True)
     audits = db.relationship('Audit', backref='entreprise', lazy=True)
+    secteur_id = db.Column(db.Integer, db.ForeignKey('secteur.id'), nullable=False)  # Lien avec le secteur
+
+class ReglementationSecteur(db.Model):
+    __tablename__ = 'reglementation_secteur'
+    id = db.Column(db.Integer, primary_key=True)
+    reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
+    secteur_id = db.Column(db.Integer, db.ForeignKey('secteur.id'), nullable=False)
 
 
 class Domaine(db.Model):
@@ -83,11 +104,18 @@ class Reglementation(db.Model):
     date_publication = db.Column(db.Date, nullable=False)
     date_derniere_mise_a_jour = db.Column(db.Date, nullable=True)
     source = db.Column(db.String(200), nullable=False)
-    secteurs_concernes = db.Column(db.String(200), nullable=True)
+    db.relationship('ReglementationSecteur', backref='reglementation', lazy=True)
     theme_id = db.Column(db.Integer, db.ForeignKey('theme.id'), nullable=False)
     sous_domaine_id = db.Column(db.Integer, db.ForeignKey('sous_domaine.id'), nullable=False)
     versions = db.relationship('VersionReglementation', backref='reglementation', lazy=True)
     articles = db.relationship('Article', backref='reglementation', lazy=True)
+
+class EntrepriseReglementation(db.Model):
+    __tablename__ = 'entreprise_reglementation'
+    id = db.Column(db.Integer, primary_key=True)
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
+    reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
+    suivi = db.Column(db.Boolean, default=True, nullable=False)  # Permet de savoir si l'entreprise suit cette réglementation
 
 class Theme(db.Model):
     __tablename__ = 'theme'
@@ -154,9 +182,3 @@ class Audit(db.Model):
     observations = db.Column(db.Text, nullable=True)
     rapport = db.Column(db.Text, nullable=True)
 
-class EntrepriseReglementation(db.Model):
-    __tablename__ = 'entreprise_reglementation'
-    id = db.Column(db.Integer, primary_key=True)
-    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
-    reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
-    suivi = db.Column(db.Boolean, default=True, nullable=False)  # Permet de savoir si l'entreprise suit cette réglementation

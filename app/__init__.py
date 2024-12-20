@@ -23,7 +23,7 @@ def create_app(config_class='config.Config'):
 
 
     # Set the login view for the LoginManager
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'admin.login'
     login_manager.login_message = 'You must be logged in to access this page.'
     login_manager.login_message_category = 'info'
 
@@ -36,14 +36,12 @@ def create_app(config_class='config.Config'):
 
     # Register Blueprints
     from .routes.main import bp as main_bp
-    from .routes.auth import bp as auth_bp
     from .routes.admin import bp as admin_bp
 
 
 
 
     app.register_blueprint(main_bp)
-    app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
 
 
