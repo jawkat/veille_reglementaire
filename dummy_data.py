@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
-from app import db
+from app import create_app, db
 from app.models import Secteur, Entreprise, ReglementationSecteur, Domaine, SousDomaine, Reglementation, Theme, VersionReglementation, Article, Evaluation, Action, Notification, Audit
+
+app = create_app()
 
 def generate_dummy_data():
     # Clear existing data
@@ -105,4 +107,5 @@ def generate_dummy_data():
 
 # Exécuter la génération des données
 if __name__ == "__main__":
-    generate_dummy_data()
+    with app.app_context():
+        generate_dummy_data()

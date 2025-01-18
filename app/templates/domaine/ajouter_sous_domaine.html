@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Ajouter un nouveau Sous-Domaine</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        
+        <!-- Domaine -->
+        <div class="form-group">
+            {{ form.domaine_id.label(class="form-label") }}
+            {{ form.domaine_id(class="form-control") }}
+            {% for error in form.domaine_id.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Nom du Sous-Domaine -->
+        <div class="form-group">
+            {{ form.nom.label(class="form-label") }}
+            {{ form.nom(class="form-control") }}
+            {% for error in form.nom.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <!-- Description du Sous-Domaine -->
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows=4) }}
+            {% for error in form.description.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+    </form>
+</div>
+{% endblock %}

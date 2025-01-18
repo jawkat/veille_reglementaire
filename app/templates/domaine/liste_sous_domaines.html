@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-2">
+        <h1>Liste des Sous-Domaines</h1>
+        <a class="btn btn-success" href="{{ url_for('reglement.ajouter_sous_domaine') }}">Ajout</a>
+    </div>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Appartenant à</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for sous_domaine in sous_domaines %}
+            <tr>
+                <td>{{ sous_domaine.nom }}</td>
+                <td>{{ sous_domaine.description or "N/A" }}</td>
+                <td>{{ sous_domaine.domaine.nom or "N/A" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

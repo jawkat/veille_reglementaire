@@ -33,10 +33,27 @@
 
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint.startswith('ingredient.') else '' }}"
+                href="#" id="secteurDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Admin Panel
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_secteurs') }}">Secteurs</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_domaines') }}">Domaines</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_sous_domaines') }}">Sous-Domaines</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_reglementations') }}">Reglementations</a></li>
+                
+              </ul>
+     
+              
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint.startswith('ingredient.') else '' }}"
                 href="#" id="ingredientDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 Réglementation
               </a>
-
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#">Normes</a></li>
+                <li><a class="dropdown-item" href="#">Législation</a></li>
+              </ul>
 
               <li class="nav-item">
                 <a class="nav-link text-white" href="{{ url_for('admin.logout') }}">Logout {{ current_user.name }}</a>

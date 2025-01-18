@@ -1,0 +1,190 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Ajouter une Réglementation</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- Domaine -->
+        <div class="form-group">
+            <label for="secteur-select" class="form-label">Domaine</label>
+            <select id="secteur-select" class="form-control">
+                <option value="">Sélectionnez un domaine</option>
+                {% for domaine in domaines %}
+                    <option value="{{ domaine.id }}">{{ domaine.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Sous-Domaine -->
+        <div class="form-group">
+            {{ form.sous_domaine_id.label(class="form-label") }}
+            {{ form.sous_domaine_id(class="form-control", id="sous-secteur-select") }}
+        </div>
+
+        <!-- Thème -->
+     
+        <!-- Thème -->
+<div class="form-group">
+    {{ form.theme_id.label(class="form-label") }}
+    {{ form.theme_id(class="form-control", id="theme-select") }}
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addThemeModal">
+        Ajouter un Thème <span class="fas fa-plus"></span>
+    </button>
+</div>
+        <!-- Titre -->
+        <div class="form-group">
+            {{ form.titre.label(class="form-label") }}
+            {{ form.titre(class="form-control") }}
+            {% for error in form.titre.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Type de Texte -->
+        <div class="form-group">
+            {{ form.type_texte.label(class="form-label") }}
+            {{ form.type_texte(class="form-control") }}
+            {% for error in form.type_texte.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Date de Publication -->
+        <div class="form-group">
+            {{ form.date_publication.label(class="form-label") }}
+            {{ form.date_publication(class="form-control") }}
+            {% for error in form.date_publication.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Source -->
+        <div class="form-group">
+            {{ form.source.label(class="form-label") }}
+            {{ form.source(class="form-control") }}
+            {% for error in form.source.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
+    </form>
+    <!-- Bouton pour ouvrir la fenêtre modale -->
+
+
+
+    <!-- Modal pour ajouter un thème -->
+<div class="modal fade" id="addThemeModal" tabindex="-1" aria-labelledby="addThemeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addThemeModalLabel">Ajouter un Thème</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="add-theme-form">
+                {{ form.hidden_tag() }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="themeNom" class="form-label">Nom du Thème</label>
+                        <input type="text" class="form-control" id="themeNom" name="nom" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="themeDescription" class="form-label">Description</label>
+                        <textarea class="form-control" id="themeDescription" name="description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    // Gestion dynamique des sous-domaines
+    document.getElementById('secteur-select').addEventListener('change', function() {
+        const domaineId = this.value;
+        const sousDomaineSelect = document.getElementById('sous-secteur-select');
+        
+        sousDomaineSelect.innerHTML = '<option value="">Sélectionnez un sous-domaine</option>';
+
+        if (domaineId) {
+            fetch(`/get_sous_domaines/${domaineId}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Erreur serveur');
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) throw new Error(data.error);
+                    data.forEach(sousDomaine => {
+                        const option = document.createElement('option');
+                        option.value = sousDomaine.id;
+                        option.textContent = sousDomaine.nom;
+                        sousDomaineSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des sous-domaines :', error);
+                    alert('Une erreur est survenue lors du chargement des sous-domaines.');
+                });
+        }
+    });
+</script>
+
+
+
+<script>
+    // Gestion de la soumission du formulaire pour ajouter un thème
+    document.getElementById('add-theme-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const nom = document.getElementById('themeNom').value;
+        const description = document.getElementById('themeDescription').value;
+        const csrfToken = "{{ form.csrf_token._value() }}";
+
+        fetch('{{ url_for("reglement.ajouter_theme") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({
+                nom: nom,
+                description: description,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Ajouter l'option à la liste déroulante des thèmes
+                const themeSelect = document.getElementById('theme-select');
+                const newOption = document.createElement('option');
+                newOption.value = data.theme.id;
+                newOption.textContent = data.theme.nom;
+                themeSelect.appendChild(newOption);
+
+                // Fermer la modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addThemeModal'));
+                modal.hide();
+
+                // Réinitialiser le formulaire
+                document.getElementById('add-theme-form').reset();
+
+                // Afficher un message de succès
+                alert(data.message);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de l\'ajout du thème:', error);
+            alert('Une erreur est survenue.');
+        });
+    });
+</script>
+{% endblock %}

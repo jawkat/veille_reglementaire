@@ -38,11 +38,14 @@ def create_app(config_class='config.Config'):
     from .routes.main import bp as main_bp
     from .routes.admin import bp as admin_bp
 
+    from .routes.reglement import bp as reglement_bp
+
 
 
 
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
+    app.register_blueprint(reglement_bp)
 
 
     return app

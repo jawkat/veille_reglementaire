@@ -59,7 +59,7 @@ class EditUserForm(FlaskForm):
     submit = SubmitField('Mettre à jour')
 
 class LoginForm(FlaskForm):
-    name = StringField('Nom', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Mot de passe', validators=[DataRequired()])
     submit = SubmitField('Se connecter')
 
@@ -149,7 +149,7 @@ def login():
         return redirect(url_for('main.index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(name=form.name.data).first()
+        user = User.query.filter_by(email=form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user)
             flash('Connexion réussie.', 'success')

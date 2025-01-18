@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Liste des Réglementations</h1>
+    <a class="btn btn-success" href="{{ url_for('reglement.ajouter_reglementation') }}">Ajout</a>
+    {% if reglementations %}
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Domaine</th>
+                    <th>Sous-Domaine</th>
+                    <th>Thème</th>
+
+                    <th>Type de Texte</th>
+                    <th>Titre</th>
+                    <th>Date de Publication</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reglementation in reglementations %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ reglementation.sous_domaine.domaine.nom }}</td>
+                        <td>{{ reglementation.sous_domaine.nom if reglementation.sous_domaine else 'N/A' }}</td>
+                        <td>{{ reglementation.theme.nom if reglementation.theme else 'N/A' }}</td>
+                        <td>{{ reglementation.type_texte }}</td>
+                        <td>{{ reglementation.titre }}</td>
+                        <td>{{ reglementation.date_publication }}</td>
+                        <td>{{ reglementation.source }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune réglementation n'a été trouvée.</p>
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

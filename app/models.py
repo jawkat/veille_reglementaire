@@ -9,7 +9,7 @@ from itsdangerous import URLSafeTimedSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 
 class RoleUtilisateur(Enum):
-    ADMIN = "Admin"
+    ADMIN = "admin"
     MANAGER = "Manager"
     RESPONSABLE = "Responsable Veille"
     COLLABORATEUR = "Collaborateur"
