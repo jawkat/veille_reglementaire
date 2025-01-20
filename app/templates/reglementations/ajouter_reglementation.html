@@ -12,7 +12,7 @@
             <select id="secteur-select" class="form-control">
                 <option value="">Sélectionnez un domaine</option>
                 {% for domaine in domaines %}
-                    <option value="{{ domaine.id }}">{{ domaine.nom }}</option>
+                <option value="{{ domaine.id }}">{{ domaine.nom }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -23,22 +23,27 @@
             {{ form.sous_domaine_id(class="form-control", id="sous-secteur-select") }}
         </div>
 
+
         <!-- Thème -->
-     
-        <!-- Thème -->
-<div class="form-group">
-    {{ form.theme_id.label(class="form-label") }}
-    {{ form.theme_id(class="form-control", id="theme-select") }}
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addThemeModal">
-        Ajouter un Thème <span class="fas fa-plus"></span>
-    </button>
-</div>
+
+        <div class="form-group">
+            {{ form.theme_id.label(class="form-label") }}
+
+            <div class="d-flex">
+                {{ form.theme_id(class="form-control", id="theme-select") }}
+                <button type="button" class="btn btn-success btn-sm p-0 m-0" data-bs-toggle="modal" data-bs-target="#addThemeModal">
+                    <span class="fas fa-plus fa-2x"></span>
+                </button>
+    
+            </div>
+
+        </div>
         <!-- Titre -->
         <div class="form-group">
             {{ form.titre.label(class="form-label") }}
             {{ form.titre(class="form-control") }}
             {% for error in form.titre.errors %}
-                <div class="text-danger">{{ error }}</div>
+            <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
@@ -47,7 +52,7 @@
             {{ form.type_texte.label(class="form-label") }}
             {{ form.type_texte(class="form-control") }}
             {% for error in form.type_texte.errors %}
-                <div class="text-danger">{{ error }}</div>
+            <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
@@ -56,7 +61,7 @@
             {{ form.date_publication.label(class="form-label") }}
             {{ form.date_publication(class="form-control") }}
             {% for error in form.date_publication.errors %}
-                <div class="text-danger">{{ error }}</div>
+            <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
@@ -65,10 +70,21 @@
             {{ form.source.label(class="form-label") }}
             {{ form.source(class="form-control") }}
             {% for error in form.source.errors %}
+            <div class="text-danger">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+   
+        <div class="form-group">
+            <label for="secteur-select">Secteurs</label>
+            {{ form.secteurs(class="form-control", id="secteur-select") }}
+            {% for error in form.secteurs.errors %}
                 <div class="text-danger">{{ error }}</div>
             {% endfor %}
         </div>
 
+
+    
         <button type="submit" class="btn btn-primary mt-3">{{ form.submit.label }}</button>
     </form>
     <!-- Bouton pour ouvrir la fenêtre modale -->
@@ -76,41 +92,41 @@
 
 
     <!-- Modal pour ajouter un thème -->
-<div class="modal fade" id="addThemeModal" tabindex="-1" aria-labelledby="addThemeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addThemeModalLabel">Ajouter un Thème</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="modal fade" id="addThemeModal" tabindex="-1" aria-labelledby="addThemeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addThemeModalLabel">Ajouter un Thème</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="add-theme-form">
+                    {{ form.hidden_tag() }}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="themeNom" class="form-label">Nom du Thème</label>
+                            <input type="text" class="form-control" id="themeNom" name="nom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="themeDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="themeDescription" name="description"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    </div>
+                </form>
             </div>
-            <form id="add-theme-form">
-                {{ form.hidden_tag() }}
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="themeNom" class="form-label">Nom du Thème</label>
-                        <input type="text" class="form-control" id="themeNom" name="nom" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="themeDescription" class="form-label">Description</label>
-                        <textarea class="form-control" id="themeDescription" name="description"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Ajouter</button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
 </div>
 
 <script>
     // Gestion dynamique des sous-domaines
-    document.getElementById('secteur-select').addEventListener('change', function() {
+    document.getElementById('secteur-select').addEventListener('change', function () {
         const domaineId = this.value;
         const sousDomaineSelect = document.getElementById('sous-secteur-select');
-        
+
         sousDomaineSelect.innerHTML = '<option value="">Sélectionnez un sous-domaine</option>';
 
         if (domaineId) {
@@ -158,33 +174,34 @@
                 description: description,
             }),
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                // Ajouter l'option à la liste déroulante des thèmes
-                const themeSelect = document.getElementById('theme-select');
-                const newOption = document.createElement('option');
-                newOption.value = data.theme.id;
-                newOption.textContent = data.theme.nom;
-                themeSelect.appendChild(newOption);
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Ajouter l'option à la liste déroulante des thèmes
+                    const themeSelect = document.getElementById('theme-select');
+                    const newOption = document.createElement('option');
+                    newOption.value = data.theme.id;
+                    newOption.textContent = data.theme.nom;
+                    themeSelect.appendChild(newOption);
 
-                // Fermer la modal
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addThemeModal'));
-                modal.hide();
+                    // Fermer la modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addThemeModal'));
+                    modal.hide();
 
-                // Réinitialiser le formulaire
-                document.getElementById('add-theme-form').reset();
+                    // Réinitialiser le formulaire
+                    document.getElementById('add-theme-form').reset();
 
-                // Afficher un message de succès
-                alert(data.message);
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur lors de l\'ajout du thème:', error);
-            alert('Une erreur est survenue.');
-        });
+                    // Afficher un message de succès
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l\'ajout du thème:', error);
+                alert('Une erreur est survenue.');
+            });
     });
 </script>
+
 {% endblock %}

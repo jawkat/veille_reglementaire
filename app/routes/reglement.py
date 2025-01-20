@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,request
-from app.models import  User, Secteur, Domaine, SousDomaine, Reglementation,Theme
+from app.models import  User, Secteur, Domaine, SousDomaine, Reglementation,Theme, ReglementationSecteur
 from app import db
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField,SelectField,DateField
+from wtforms import StringField, TextAreaField, SubmitField,SelectField,DateField,SelectMultipleField
 from wtforms.validators import DataRequired, Length
 
 from flask_login import login_required, current_user
@@ -119,7 +119,15 @@ class ReglementationForm(FlaskForm):
     source = StringField('Source', validators=[DataRequired()])
     sous_domaine_id = SelectField('Sous-Domaine', choices=[], coerce=int, validators=[DataRequired()])
     theme_id = SelectField('Thème', coerce=int, validators=[DataRequired()])
+
+     # Champ pour sélectionner plusieurs secteurs
+    secteurs = SelectMultipleField('Secteurs', coerce=int, choices=[])  # champ de sélection multiple
     submit = SubmitField('Ajouter Réglementation')
+
+    def __init__(self, *args, **kwargs):
+        super(ReglementationForm, self).__init__(*args, **kwargs)
+        # Charger les secteurs dans le formulaire
+        self.secteurs.choices = [(secteur.id, secteur.nom) for secteur in Secteur.query.all()]
 
 class VersionReglementationForm(FlaskForm):
     version_numero = StringField('Numéro de Version', validators=[DataRequired()])
@@ -133,6 +141,7 @@ def ajouter_reglementation():
     form = ReglementationForm()
     domaines = Domaine.query.all()
     themes = Theme.query.all()
+    secteurs = Secteur.query.all()  # Récupérer tous les secteurs
 
     if not domaines:
         flash("Aucun domaine disponible. Veuillez ajouter des domaines avant de continuer.", "warning")
@@ -164,10 +173,25 @@ def ajouter_reglementation():
             )
             db.session.add(reglementation)
             db.session.commit()
+
+            secteurs_selectionnes = request.form.getlist('secteurs')
+            
+
+            for secteur_id in secteurs_selectionnes:
+                reglementation_secteur = ReglementationSecteur(
+                    reglementation_id=reglementation.id,
+                    secteur_id=secteur_id
+                )
+                db.session.add(reglementation_secteur)
+
+            db.session.commit()
+
             flash("Réglementation ajoutée avec succès.", "success")
             return redirect(url_for('reglement.liste_reglementations'))
+        
 
-    return render_template('reglementations/ajouter_reglementation.html', form=form, domaines=domaines)
+    return render_template('reglementations/ajouter_reglementation.html', form=form, domaines=domaines,
+                secteurs=secteurs, selected_secteurs=form.secteurs.data)
 
 
 
@@ -202,6 +226,28 @@ def liste_reglementations():
         return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
 
 
+
+@bp.route('/reglementation/<int:id>', methods=['GET'])
+def detail_reglementation(id):
+    reglementation = Reglementation.query.get_or_404(id)
+
+    theme = Theme.query.get(reglementation.theme_id)
+    sous_domaine = SousDomaine.query.get(reglementation.sous_domaine_id)
+
+    # Récupérer les secteurs associés à la réglementation
+    secteurs = [secteur for secteur in 
+                (ReglementationSecteur.query.filter_by(reglementation_id=id)
+                .join(Secteur, Secteur.id == ReglementationSecteur.secteur_id)
+                .all())]
+
+    return render_template('reglementations/detail_reglementation.html',
+            reglementation=reglementation,
+            theme=theme,
+            sous_domaine=sous_domaine,
+            secteurs=secteurs)
+
+
+
 @bp.route('/ajouter-theme', methods=['POST'])
 def ajouter_theme():
     try:
@@ -224,3 +270,9 @@ def ajouter_theme():
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'error', 'message': f"Erreur lors de l'ajout du thème : {str(e)}"}), 500
+
+
+
+# *********************** ajout Secteur à la reglemanatation  *********************
+
+

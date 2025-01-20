@@ -21,7 +21,8 @@
             </thead>
             <tbody>
                 {% for reglementation in reglementations %}
-                    <tr>
+                <tr onclick="window.location.href='{{ url_for('reglement.detail_reglementation', id=reglementation.id) }}'"
+                style="cursor: pointer;">
                         <td>{{ loop.index }}</td>
                         <td>{{ reglementation.sous_domaine.domaine.nom }}</td>
                         <td>{{ reglementation.sous_domaine.nom if reglementation.sous_domaine else 'N/A' }}</td>
