@@ -2,30 +2,92 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Détails de la Réglementation</h1>
+ 
     <div class="card mt-3">
         <div class="card-header">
             <h3>{{ reglementation.titre }}</h3>
         </div>
         <div class="card-body">
-            <p><strong>Type de Texte :</strong> {{ reglementation.type_texte }}</p>
-            <p><strong>Date de Publication :</strong> {{ reglementation.date_publication.strftime('%d/%m/%Y') }}</p>
+            <p><strong>Type de Texte :</strong> {{ reglementation.type_texte
+                }}</p>
+            <p><strong>Date de Publication :</strong> {{
+                reglementation.date_publication.strftime('%d/%m/%Y') }}</p>
             <p><strong>Source :</strong> {{ reglementation.source }}</p>
-            <p><strong>Thème :</strong> {{ theme.nom if theme else "Non spécifié" }}</p>
-            <p><strong>Sous-Domaine :</strong> {{ sous_domaine.nom if sous_domaine else "Non spécifié" }}</p>
+            <p><strong>Thème :</strong> {{ theme.nom if theme else
+                "Non spécifié" }}</p>
+            <p><strong>Sous-Domaine :</strong> {{ sous_domaine.nom if
+                sous_domaine else "Non spécifié" }}</p>
 
             <!-- Affichage des secteurs associés -->
             <h5>Secteurs Associés :</h5>
             <ul>
                 {% for secteur in secteurs %}
-                    <li>{{ secteur.secteur.nom }}</li>  <!-- Affiche le nom du secteur -->
+                <li>{{ secteur.secteur.nom }}</li>
+                <!-- Affiche le nom du secteur -->
                 {% else %}
-                    <li>Aucun secteur associé.</li>
+                <li>Aucun secteur associé.</li>
                 {% endfor %}
             </ul>
+
+<hr>
+            <h5>Articles :</h5>
+            {% if reglementation.articles %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Numéro</th>
+                        <th>Contenu</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for article in reglementation.articles %}
+                    <tr>
+                        <td>{{ article.numero }}</td>
+                        <td>{{ article.contenu }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Aucune version associée.</p>
+            {% endif %}
+
+            <hr>
+            <!-- Affichage des secteurs associés -->
+            <h5>Versions :</h5>
+            {% if reglementation.versions %}
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Numéro de Version</th>
+                        <th>Contenu</th>
+                        <th>Date mise à jour</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for version in reglementation.versions %}
+                    <tr>
+                        <td>{{ version.version_numero }}</td>
+                        <td>{{ version.contenu }}</td>
+                        <td>{{ version.date_creation.strftime('%Y-%m-%d')
+                            }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>Aucune version associée.</p>
+            {% endif %}
+
+
+
         </div>
         <div class="card-footer">
-            <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary">Retour à la liste</a>
+            <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}" class="btn btn-success">
+                Ajouter un Article
+            </a>
+            <a href="{{ url_for('reglement.liste_reglementations') }}"
+                class="btn btn-secondary">Retour à la liste</a>
         </div>
     </div>
 </div>

@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from functools import wraps
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,request
-from app.models import  User, Secteur, Domaine, SousDomaine, Reglementation,Theme, ReglementationSecteur
+from app.models import  (User, Secteur, Domaine, 
+        SousDomaine, Reglementation,Theme, ReglementationSecteur,VersionReglementation, Article)
 from app import db
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField,SelectField,DateField,SelectMultipleField
@@ -174,9 +175,19 @@ def ajouter_reglementation():
             db.session.add(reglementation)
             db.session.commit()
 
-            secteurs_selectionnes = request.form.getlist('secteurs')
-            
 
+            # Création de la première version de la réglementation (Version 1)
+            version = VersionReglementation(
+                version_numero='1',
+                contenu="Version initiale de la réglementation.",
+                reglementation_id=reglementation.id
+            )
+            db.session.add(version)
+            db.session.commit()  # Commit de la version
+
+
+            secteurs_selectionnes = request.form.getlist('secteurs')
+        
             for secteur_id in secteurs_selectionnes:
                 reglementation_secteur = ReglementationSecteur(
                     reglementation_id=reglementation.id,
@@ -214,7 +225,7 @@ def liste_reglementations():
     try:
         # Récupérer toutes les réglementations
         reglementations = Reglementation.query.all()
-        
+    
         # Vérifier si des réglementations existent
         if not reglementations:
             flash("Aucune réglementation n'est disponible.", "warning")
@@ -272,7 +283,39 @@ def ajouter_theme():
         return jsonify({'status': 'error', 'message': f"Erreur lors de l'ajout du thème : {str(e)}"}), 500
 
 
+##****************** ajout article **********************
 
-# *********************** ajout Secteur à la reglemanatation  *********************
 
+class ArticleForm(FlaskForm):
+    numero = StringField('Numéro', validators=[DataRequired()])
+    titre = StringField('Titre', validators=[DataRequired()])
+    contenu = TextAreaField('Contenu', validators=[DataRequired()])
+    langue = StringField('Langue', validators=[DataRequired()])
+    submit = SubmitField('Ajouter Article')
 
+@bp.route('/ajouter-article/<int:reglementation_id>', methods=['GET', 'POST'])
+def ajouter_article(reglementation_id):
+    # Récupérer la réglementation pour afficher ses informations dans le formulaire
+    reglementation = Reglementation.query.get_or_404(reglementation_id)
+    
+    form = ArticleForm()
+    
+
+    if form.validate_on_submit():
+        # Créer un nouvel article lié à la réglementation
+        article = Article(
+            numero=form.numero.data,
+            titre=form.titre.data,
+            contenu=form.contenu.data,
+            langue=form.langue.data,
+            reglementation_id=reglementation.id
+        )
+        
+        # Ajouter l'article à la session et commettre
+        db.session.add(article)
+        db.session.commit()
+
+        flash('Article ajouté avec succès.', 'success')
+        return redirect(url_for('reglement.detail_reglementation', id=reglementation.id))
+
+    return render_template('articles/ajouter_article.html', form=form, reglementation=reglementation)
