@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-3">Liste des entreprises</h1>
+
+    {% if entreprises %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Description</th>
+                    <th>Pays</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entreprise in entreprises %}
+                    <tr>
+                        <td>{{ entreprise.nom }}</td>
+                        <td>{{ entreprise.description }}</td>
+                        <td>{{ entreprise.pays }}</td>
+                        <td>
+                            <a href="{{ url_for('reglement.afficher_entreprise', entreprise_id=entreprise.id) }}" 
+                               class="btn btn-primary btn-sm">Voir</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune entreprise trouvée.</p>
+    {% endif %}
+</div>
+{% endblock %}

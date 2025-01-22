@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    
     role = db.Column(db.Enum(RoleUtilisateur), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=True)
@@ -55,24 +56,33 @@ class Secteur(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
-    entreprises = db.relationship('Entreprise', backref='secteur', lazy=True)
+    entreprises = db.relationship('Entreprise', secondary='entreprise_secteur', back_populates='secteurs')
     reglementations = db.relationship('ReglementationSecteur', backref='secteur', lazy=True)
 
+
+class EntrepriseSecteur(db.Model):
+    __tablename__ = 'entreprise_secteur'
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), primary_key=True)
+    secteur_id = db.Column(db.Integer, db.ForeignKey('secteur.id'), primary_key=True)
 
 # Organisation
 
 class Entreprise(db.Model):
     __tablename__ = 'entreprise'
     id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
+    nom = db.Column(db.String(100), nullable=False, unique=True )
     
     description = db.Column(db.Text, nullable=True)
     pays = db.Column(db.String(100), nullable=True)
+
+    date_creation = db.Column(db.Date, nullable=True)
+
     utilisateurs = db.relationship('User', backref='entreprise', lazy=True)
     reglementations = db.relationship('EntrepriseReglementation', backref='entreprise', lazy=True)
     notifications = db.relationship('Notification', backref='entreprise', lazy=True)
     audits = db.relationship('Audit', backref='entreprise', lazy=True)
-    secteur_id = db.Column(db.Integer, db.ForeignKey('secteur.id'), nullable=False)  # Lien avec le secteur
+    secteurs = db.relationship('Secteur', secondary='entreprise_secteur', back_populates='entreprises')
+
 
 class ReglementationSecteur(db.Model):
     __tablename__ = 'reglementation_secteur'
@@ -84,14 +94,14 @@ class ReglementationSecteur(db.Model):
 class Domaine(db.Model):
     __tablename__ = 'domaine'
     id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
+    nom = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     sous_domaines = db.relationship('SousDomaine', backref='domaine', lazy=True)
 
 class SousDomaine(db.Model):
     __tablename__ = 'sous_domaine'
     id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
+    nom = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     domaine_id = db.Column(db.Integer, db.ForeignKey('domaine.id'), nullable=False)
     reglementations = db.relationship('Reglementation', backref='sous_domaine', lazy=True)
@@ -99,7 +109,7 @@ class SousDomaine(db.Model):
 class Reglementation(db.Model):
     __tablename__ = 'reglementation'
     id = db.Column(db.Integer, primary_key=True)
-    titre = db.Column(db.String(200), nullable=False)
+    titre = db.Column(db.String(200), nullable=False, unique=True)
     type_texte = db.Column(db.String(100), nullable=False)
     date_publication = db.Column(db.Date, nullable=False)
     date_derniere_mise_a_jour = db.Column(db.Date, nullable=True)
@@ -120,7 +130,7 @@ class EntrepriseReglementation(db.Model):
 class Theme(db.Model):
     __tablename__ = 'theme'
     id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
+    nom = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.Text, nullable=True)
     reglementations = db.relationship('Reglementation', backref='theme', lazy=True)
 
@@ -136,7 +146,7 @@ class Article(db.Model):
     __tablename__ = 'article'
     id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.String(50), nullable=False)
-    titre = db.Column(db.String(200), nullable=False)
+    titre = db.Column(db.String(200), nullable=False, unique=True)
     contenu = db.Column(db.Text, nullable=True)
     langue = db.Column(db.String(50), nullable=True)
     reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)

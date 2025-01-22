@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-3">{{ entreprise.nom }}</h1>
+    <p><strong>Description :</strong> {{ entreprise.description }}</p>
+    <p><strong>Pays :</strong> {{ entreprise.pays }}</p>
+    <p><strong>Date d'ajout :</strong> 
+        {{ entreprise.date_creation.strftime('%d/%m/%Y') if entreprise.date_creation else '--' }}
+    </p>
+    
+    <h2 class="mt-4">Utilisateurs associés</h2>
+    {% if utilisateurs %}
+        <table class="table table-bordered mt-3">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in utilisateurs %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.role.value}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucun utilisateur n'est associé à cette entreprise.</p>
+    {% endif %}
+</div>
+{% endblock %}

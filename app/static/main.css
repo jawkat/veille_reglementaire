@@ -110,7 +110,7 @@ background-color: var(--nomai);
 }
 
 .btn {
-  min-width: 100px;
+  min-width: auto;
 }
 
 

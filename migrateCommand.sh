@@ -1,4 +1,4 @@
 
 flask db init
-flask db migrate -m "ajouter status plat"
+flask db migrate -m "ajout date creation entreprise"
 flask db upgrade

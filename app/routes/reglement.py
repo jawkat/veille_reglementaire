@@ -1,12 +1,13 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from functools import wraps
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,request
 from app.models import  (User, Secteur, Domaine, 
-        SousDomaine, Reglementation,Theme, ReglementationSecteur,VersionReglementation, Article)
+        SousDomaine, Reglementation,Theme, ReglementationSecteur,
+        VersionReglementation, Article, Entreprise, EntrepriseSecteur)
 from app import db
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField, SubmitField,SelectField,DateField,SelectMultipleField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, TextAreaField, SubmitField,SelectField,DateField,SelectMultipleField, EmailField
+from wtforms.validators import DataRequired, Length, Email
 
 from flask_login import login_required, current_user
 from app.routes.admin import role_required
@@ -152,14 +153,25 @@ def ajouter_reglementation():
         flash("Aucun thème disponible. Veuillez ajouter des thèmes avant de continuer.", "warning")
         return redirect(url_for('reglement.ajouter_theme'))
 
+
+
     # Initialisation des choix pour le formulaire
     form.theme_id.choices = [(theme.id, theme.nom) for theme in themes]
     form.sous_domaine_id.choices = [(sous_domaine.id, sous_domaine.nom) for sous_domaine in SousDomaine.query.all()]
 
 
     if form.validate_on_submit():
+
+        # Vérifier si le titre existe déjà
+        titre_existant = Reglementation.query.filter_by(titre=form.titre.data).first()
+        if titre_existant:
+            flash("Une réglementation avec ce titre existe déjà. Veuillez en choisir un autre.", "danger")
+            return render_template('reglementations/ajouter_reglementation.html', form=form, domaines=domaines,
+                                    secteurs=secteurs, selected_secteurs=form.secteurs.data)
+
         submitted_sous_domaine = form.sous_domaine_id.data
         valid_choices = [choice[0] for choice in form.sous_domaine_id.choices]
+        
 
         if submitted_sous_domaine not in valid_choices:
             flash("Sous-domaine sélectionné invalide.", "danger")
@@ -319,3 +331,123 @@ def ajouter_article(reglementation_id):
         return redirect(url_for('reglement.detail_reglementation', id=reglementation.id))
 
     return render_template('articles/ajouter_article.html', form=form, reglementation=reglementation)
+
+
+# ********************  ajout entreprise et le Manager du compte ****************************************
+
+
+class EntrepriseForm(FlaskForm):
+    nom = StringField('Nom de l\'entreprise', validators=[DataRequired()])
+    description = TextAreaField('Description de l\'entreprise')
+    pays = StringField('Pays', validators=[DataRequired()])
+    date_creation = DateField('Date de Creation', format='%Y-%m-%d', validators=[DataRequired()], default=date.today)
+    secteurs = SelectMultipleField('Secteurs', coerce=int, choices=[])  # champ de sélection multiple
+
+    def __init__(self, *args, **kwargs):
+        super(EntrepriseForm, self).__init__(*args, **kwargs)
+        # Charger les secteurs dans le formulaire
+        self.secteurs.choices = [(secteur.id, secteur.nom) for secteur in Secteur.query.all()]
+
+
+
+class UserForm(FlaskForm):
+    name = StringField('Nom de l\'utilisateur', validators=[DataRequired()])
+    email = EmailField('Email', validators=[DataRequired(), Email()])
+    role = SelectField('Rôle', choices=[('MANAGER', 'Manager'),
+            ('RESPONSABLE','Responsable Veille'),
+            ('COLLABORATEUR','Collaborateur')], validators=[DataRequired()])
+    password = StringField('Mot de passe', validators=[DataRequired()])
+
+
+
+@bp.route('/ajouter_entreprise_et_manager', methods=['GET', 'POST'])
+@login_required
+def ajouter_entreprise_et_manager():
+    entreprise_form = EntrepriseForm()
+    user_form = UserForm()
+    secteurs = Secteur.query.all()  # Récupérer tous les secteurs
+
+    # Initialiser les choix pour le champ secteurs
+    entreprise_form.secteurs.choices = [(secteur.id, secteur.nom) for secteur in secteurs]
+
+    if entreprise_form.validate_on_submit() and user_form.validate_on_submit():
+        # Vérifier si l'entreprise existe déjà
+        entreprise = Entreprise.query.filter_by(nom=entreprise_form.nom.data).first()
+
+        if not entreprise:
+            # Créer l'entreprise
+            entreprise = Entreprise(
+                nom=entreprise_form.nom.data,
+                description=entreprise_form.description.data,
+                pays=entreprise_form.pays.data,
+                date_creation= date.today()
+            )
+            db.session.add(entreprise)
+            db.session.commit()
+
+            # Associer les secteurs sélectionnés à l'entreprise
+            secteurs_selectionnes = entreprise_form.secteurs.data
+            for secteur_id in secteurs_selectionnes:
+                entreprise_secteur = EntrepriseSecteur(
+                    entreprise_id=entreprise.id,
+                    secteur_id=secteur_id
+                )
+                db.session.add(entreprise_secteur)
+            db.session.commit()
+
+            flash('Entreprise ajoutée avec succès.', 'success')
+        else:
+            flash('L\'entreprise existe déjà.', 'warning')
+
+        # Vérifier si un utilisateur avec cet email existe déjà
+        existant_user = User.query.filter_by(email=user_form.email.data).first()
+
+        if existant_user:
+            flash("Un utilisateur avec cet email existe déjà. Veuillez en choisir un autre.", "danger")
+            return render_template(
+                'entreprise/ajouter_entreprise_et_manager.html',
+                entreprise_form=entreprise_form,
+                user_form=user_form
+            )
+
+        # Créer l'utilisateur avec le rôle approprié
+        manager_user = User(
+            name=user_form.name.data,
+            email=user_form.email.data,
+            role=user_form.role.data,
+            entreprise_id=entreprise.id
+        )
+        manager_user.set_password(user_form.password.data)
+        db.session.add(manager_user)
+        db.session.commit()
+        flash('Utilisateur avec rôle manager ajouté avec succès.', 'success')
+
+        return redirect(url_for('reglement.liste_entreprises'))
+
+    return render_template(
+        'entreprise/ajouter_entreprise_et_manager.html',
+        entreprise_form=entreprise_form,
+        user_form=user_form
+    )
+
+
+@bp.route('/entreprise/<int:entreprise_id>', methods=['GET'])
+@login_required
+def afficher_entreprise(entreprise_id):
+    # Récupérer l'entreprise avec ses utilisateurs
+    entreprise = Entreprise.query.filter_by(id=entreprise_id).first_or_404()
+    utilisateurs = User.query.filter_by(entreprise_id=entreprise.id).all()
+
+    return render_template(
+        'entreprise/afficher_entreprise.html',
+        entreprise=entreprise,
+        utilisateurs=utilisateurs
+    )
+
+
+@bp.route('/entreprises', methods=['GET'])
+@login_required
+def liste_entreprises():
+    # Récupérer toutes les entreprises
+    entreprises = Entreprise.query.all()
+    return render_template('entreprise/liste_entreprises.html', entreprises=entreprises)
