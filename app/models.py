@@ -149,6 +149,8 @@ class EntrepriseReglementation(db.Model):
     reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
     suivi = db.Column(db.Boolean, default=True, nullable=False)  # Permet de savoir si l'entreprise suit cette réglementation
 
+    reglementation = db.relationship('Reglementation', backref='entreprises_associees')
+
 class Theme(db.Model):
     __tablename__ = 'theme'
     id = db.Column(db.Integer, primary_key=True)

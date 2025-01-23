@@ -32,5 +32,25 @@
     {% else %}
         <p>Aucun utilisateur n'est associé à cette entreprise.</p>
     {% endif %}
+
+
+    <h2 class="mt-4">Réglementations associées</h2>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entreprise_reglementation in entreprise.reglementations %}
+                <tr>
+                    <td>{{ entreprise_reglementation.reglementation.titre }}</td>
+                    <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
 </div>
 {% endblock %}
