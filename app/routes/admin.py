@@ -10,7 +10,7 @@ from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 from flask_wtf import FlaskForm
 from functools import wraps
 from app import db, mail
-from app.models import User
+from app.models import User, Entreprise
 
 # Définition des blueprints
 bp = Blueprint('admin', __name__)
@@ -26,7 +26,7 @@ def role_required(allowed_roles):
                 flash("Vous devez être connecté pour accéder à cette page.", 'danger')
                 return redirect(url_for('main.index'))
 
-            if current_user.role not in allowed_roles:
+            if current_user.role.name not in allowed_roles:
                 flash("Vous n'avez pas la permission d'accéder à cette page.", 'danger')
                 return redirect(url_for('main.index'))
 
@@ -42,13 +42,9 @@ class AddUserForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     role = RadioField(
         'Rôle',
-        choices=[
-            ('gerant', 'Gérant Nomai'), 
-            ('manager', 'Manager Nomai'), 
-            ('qualite', 'Technicienne Qualité'), 
-            ('admin', 'Admin')
-        ], 
-        validators=[DataRequired()]
+        choices=[('MANAGER', 'Manager'),
+            ('RESPONSABLE','Responsable Veille'),
+            ('COLLABORATEUR','Collaborateur')], validators=[DataRequired()]
     )
     password = PasswordField('Mot de passe', validators=[DataRequired()])
     submit = SubmitField('Ajouter l’utilisateur')
@@ -84,61 +80,13 @@ class ResetPasswordForm(FlaskForm):
 # Routes pour la gestion des utilisateurs (Admin)
 # ------------------------------------
 @bp.route('/admin/manage-users')
-@role_required(['admin'])
+@role_required(['ADMIN'])
 def manage_users():
+    entreprises = Entreprise.query.all()
     users = User.query.all()
-    return render_template('admin/manage_users.html', users=users)
+ 
+    return render_template('admin/manage_users.html', entreprises=entreprises, users=users)
 
-@bp.route('/admin/add_user', methods=['GET', 'POST'])
-@role_required(['admin'])
-def add_user():
-    form = AddUserForm()
-    if form.validate_on_submit():
-        if User.query.filter_by(email=form.email.data).first():
-            flash("L'email est déjà utilisé.", 'danger')
-            return redirect(url_for('admin.add_user'))
-
-        if User.query.filter_by(name=form.name.data).first():
-            flash("Le nom est déjà utilisé.", 'danger')
-            return redirect(url_for('admin.add_user'))
-
-        user = User(
-            name=form.name.data,
-            email=form.email.data,
-            role=form.role.data
-        )
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash(f"L’utilisateur {user.name} a été ajouté avec succès!", 'success')
-        return redirect(url_for('admin.manage_users'))
-    return render_template('admin/add_user.html', form=form)
-
-@bp.route('/admin/edit_user/<int:user_id>', methods=['GET', 'POST'])
-@role_required(['admin'])
-def edit_user(user_id):
-    user = User.query.get_or_404(user_id)
-    form = EditUserForm(obj=user)
-    if form.validate_on_submit():
-        if User.query.filter_by(email=form.email.data).first() and user.email != form.email.data:
-            flash("L'email est déjà utilisé.", 'danger')
-            return redirect(url_for('admin.edit_user', user_id=user.id))
-
-        user.name = form.name.data
-        user.email = form.email.data
-        db.session.commit()
-        flash(f"L’utilisateur {user.name} a été mis à jour avec succès!", 'success')
-        return redirect(url_for('admin.manage_users'))
-    return render_template('admin/edit_user.html', form=form)
-
-@bp.route('/admin/delete_user/<int:user_id>', methods=['POST'])
-@role_required(['admin'])
-def delete_user(user_id):
-    user = User.query.get_or_404(user_id)
-    db.session.delete(user)
-    db.session.commit()
-    flash(f"L’utilisateur {user.name} a été supprimé.", 'danger')
-    return redirect(url_for('admin.manage_users'))
 
 # ------------------------------------
 # Routes pour l'authentification (Auth)
@@ -190,6 +138,11 @@ def reset_token(token):
         db.session.commit()
         flash('Mot de passe réinitialisé avec succès.', 'success')
         return redirect(url_for('admin.login'))
+    else:
+        print(f"Mot de passe : {form.password.data}")
+        print(f"Confirmation : {form.confirm_password.data}")
+        print(form.errors)  # Affiche les erreurs dans la console
+        flash("Erreur dans le formulaire : " + str(form.errors), 'danger')
     return render_template('admin/reset_token.html', form=form)
 
 # ------------------------------------

@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Ajouter un utilisateur à l'entreprise : {{ entreprise.nom }}</h2>
+    <form method="POST">
+        {{ user_form.hidden_tag() }}
+
+        <div class="form-group">
+            <label for="name">Nom de l'utilisateur</label>
+            {{ user_form.name(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            {{ user_form.email(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="role">Rôle</label>
+            {{ user_form.role(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            {{ user_form.password(class="form-control") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ajouter</button>
+    </form>
+</div>
+{% endblock %}

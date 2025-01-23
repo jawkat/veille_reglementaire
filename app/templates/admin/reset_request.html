@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Réinitialisation du mot de passe</h2>
+    <p class="text-center">Entrez votre adresse e-mail ci-dessous pour recevoir un lien de réinitialisation.</p>
+    <form method="POST" action="{{ url_for('admin.reset_request') }}" class="mt-4">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", placeholder="Entrez votre e-mail") }}
+            {% for error in form.email.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group text-center mt-4">
+            <button type="submit" class="btn btn-primary">Envoyer le lien de réinitialisation</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

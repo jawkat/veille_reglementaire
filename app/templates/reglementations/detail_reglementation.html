@@ -57,10 +57,21 @@
                 <tbody>
                     {% for article in reglementation.articles %}
                     <tr>
+                        {% if article.titre %}
+                            <!-- Si l'article a un titre, on fusionne les colonnes -->
+                            <td colspan="2" class="font-weight-bold text-center">{{ article.titre }}</td>
+                    </tr>
+                        {% endif %}
+                    <tr>
                         <td>{{ article.numero }}</td>
-                        <td>{{ article.contenu }}</td>
+                        <td>
+                            {% for ligne in article.contenu.split('\n') %}
+                                <p>{{ ligne }}</p>
+                            {% endfor %}
+                        </td>
                     </tr>
                     {% endfor %}
+                    
                 </tbody>
             </table>
             {% else %}

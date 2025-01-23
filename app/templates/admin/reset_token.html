@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Réinitialiser votre mot de passe</h2>
+    <p class="text-center">Entrez un nouveau mot de passe ci-dessous.</p>
+    <form method="POST" action="{{ url_for('admin.reset_token', token=token) }}" class="mt-4">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="Entrez un nouveau mot de passe") }}
+            {% for error in form.password.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ form.confirm_password.label(class="form-label") }}
+            {{ form.confirm_password(class="form-control", placeholder="Confirmez le mot de passe") }}
+            {% for error in form.confirm_password.errors %}
+            <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </div>
+        <div class="form-group text-center mt-4">
+            <button type="submit" class="btn btn-success">Réinitialiser le mot de passe</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

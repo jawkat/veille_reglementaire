@@ -119,6 +119,8 @@ class ReglementationForm(FlaskForm):
     type_texte = StringField('Type de Texte', validators=[DataRequired()])
     date_publication = DateField('Date de Publication', format='%Y-%m-%d', validators=[DataRequired()])
     source = StringField('Source', validators=[DataRequired()])
+
+    langue = StringField('Langue', validators=[DataRequired()])
     sous_domaine_id = SelectField('Sous-Domaine', choices=[], coerce=int, validators=[DataRequired()])
     theme_id = SelectField('Thème', coerce=int, validators=[DataRequired()])
 
@@ -181,6 +183,7 @@ def ajouter_reglementation():
                 type_texte=form.type_texte.data,
                 date_publication=form.date_publication.data,
                 source=form.source.data,
+                langue=form.langue.data,
                 theme_id=form.theme_id.data,
                 sous_domaine_id=form.sous_domaine_id.data
             )
@@ -302,7 +305,7 @@ class ArticleForm(FlaskForm):
     numero = StringField('Numéro', validators=[DataRequired()])
     titre = StringField('Titre', validators=[DataRequired()])
     contenu = TextAreaField('Contenu', validators=[DataRequired()])
-    langue = StringField('Langue', validators=[DataRequired()])
+
     submit = SubmitField('Ajouter Article')
 
 @bp.route('/ajouter-article/<int:reglementation_id>', methods=['GET', 'POST'])
@@ -317,9 +320,8 @@ def ajouter_article(reglementation_id):
         # Créer un nouvel article lié à la réglementation
         article = Article(
             numero=form.numero.data,
-            titre=form.titre.data,
+            titre = form.titre.data,
             contenu=form.contenu.data,
-            langue=form.langue.data,
             reglementation_id=reglementation.id
         )
         
@@ -353,7 +355,7 @@ class EntrepriseForm(FlaskForm):
 class UserForm(FlaskForm):
     name = StringField('Nom de l\'utilisateur', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    role = SelectField('Rôle', choices=[('MANAGER', 'Manager'),
+    role = SelectField('Rôle', choices=[
             ('RESPONSABLE','Responsable Veille'),
             ('COLLABORATEUR','Collaborateur')], validators=[DataRequired()])
     password = StringField('Mot de passe', validators=[DataRequired()])
@@ -393,6 +395,10 @@ def ajouter_entreprise_et_manager():
                     secteur_id=secteur_id
                 )
                 db.session.add(entreprise_secteur)
+            db.session.commit()
+
+            # Appeler la méthode pour attribuer les réglementations liées aux secteurs
+            entreprise.assign_reglementations()
             db.session.commit()
 
             flash('Entreprise ajoutée avec succès.', 'success')

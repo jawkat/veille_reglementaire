@@ -1,0 +1,27 @@
+<!-- manager/liste_utilisateurs.html -->
+{% extends 'layout.html' %}
+
+{% block content %}
+<h2>Utilisateurs de l'entreprise : {{ entreprise.nom }}</h2>
+<a class="btn btn-success" href="{{ url_for('manager.ajouter_utilisateur',entreprise_id=entreprise.id) }}">
+    <span class="fas fa-plus fa-2x"></span></a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for utilisateur in utilisateurs %}
+        <tr>
+            <td>{{ utilisateur.name }}</td>
+            <td>{{ utilisateur.email }}</td>
+            <td>{{ utilisateur.role.name }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

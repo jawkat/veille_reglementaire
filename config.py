@@ -13,3 +13,5 @@ class Config:
     MAIL_DEFAULT_SENDER = 'noreply@demo.com'
     MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'pic3promo@gmail.com')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'ukns hlfx kixi ydxq')
+
+

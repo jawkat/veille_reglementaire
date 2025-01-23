@@ -33,7 +33,7 @@ class User(db.Model, UserMixin):
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(current_app.config['SECRET_KEY'])
-        return s.dumps({'user_id': self.id}).decode('utf-8')
+        return s.dumps({'user_id': self.id})
 
     @staticmethod
     def verify_reset_token(token, expires_sec=1800):
@@ -57,7 +57,7 @@ class Secteur(db.Model):
     nom = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
     entreprises = db.relationship('Entreprise', secondary='entreprise_secteur', back_populates='secteurs')
-    reglementations = db.relationship('ReglementationSecteur', backref='secteur', lazy=True)
+    reglementations = db.relationship('ReglementationSecteur', back_populates='secteur', lazy=True)
 
 
 class EntrepriseSecteur(db.Model):
@@ -83,12 +83,31 @@ class Entreprise(db.Model):
     audits = db.relationship('Audit', backref='entreprise', lazy=True)
     secteurs = db.relationship('Secteur', secondary='entreprise_secteur', back_populates='entreprises')
 
+    def assign_reglementations(self):
+        """Attribuer automatiquement les réglementations liées aux secteurs de l'entreprise."""
+        # Créez un ensemble des réglementations déjà associées
+        reglementations_existantes = {r.reglementation_id for r in self.reglementations}
+
+        # Ajoutez uniquement les réglementations non associées
+        for secteur in self.secteurs:
+            for reglementation_secteur in secteur.reglementations:
+                if reglementation_secteur.reglementation_id not in reglementations_existantes:
+                    entreprise_reglementation = EntrepriseReglementation(
+                        entreprise_id=self.id,
+                        reglementation_id=reglementation_secteur.reglementation_id
+                    )
+                    db.session.add(entreprise_reglementation)
+
 
 class ReglementationSecteur(db.Model):
     __tablename__ = 'reglementation_secteur'
     id = db.Column(db.Integer, primary_key=True)
     reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
     secteur_id = db.Column(db.Integer, db.ForeignKey('secteur.id'), nullable=False)
+
+    # Relations explicites
+    secteur = db.relationship('Secteur', back_populates='reglementations')
+    reglementation = db.relationship('Reglementation', back_populates='secteurs')
 
 
 class Domaine(db.Model):
@@ -114,7 +133,10 @@ class Reglementation(db.Model):
     date_publication = db.Column(db.Date, nullable=False)
     date_derniere_mise_a_jour = db.Column(db.Date, nullable=True)
     source = db.Column(db.String(200), nullable=False)
-    db.relationship('ReglementationSecteur', backref='reglementation', lazy=True)
+    langue = db.Column(db.String(50), nullable=True)
+
+    secteurs=db.relationship('ReglementationSecteur', back_populates='reglementation', lazy=True)
+
     theme_id = db.Column(db.Integer, db.ForeignKey('theme.id'), nullable=False)
     sous_domaine_id = db.Column(db.Integer, db.ForeignKey('sous_domaine.id'), nullable=False)
     versions = db.relationship('VersionReglementation', backref='reglementation', lazy=True)
@@ -146,9 +168,9 @@ class Article(db.Model):
     __tablename__ = 'article'
     id = db.Column(db.Integer, primary_key=True)
     numero = db.Column(db.String(50), nullable=False)
-    titre = db.Column(db.String(200), nullable=False, unique=True)
+    titre = db.Column(db.String(200), nullable=True)
     contenu = db.Column(db.Text, nullable=True)
-    langue = db.Column(db.String(50), nullable=True)
+
     reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
     evaluations = db.relationship('Evaluation', backref='article', lazy=True)
 

@@ -10,11 +10,13 @@
             <!-- Domaine -->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="secteur-select" class="form-label">Domaine</label>
+                    <label for="secteur-select"
+                        class="form-label">Domaine</label>
                     <select id="secteur-select" class="form-control">
-                        <option value="">Sélectionnez un domaine</option>
+                        <option value>Sélectionnez un domaine</option>
                         {% for domaine in domaines %}
-                        <option value="{{ domaine.id }}">{{ domaine.nom }}</option>
+                        <option value="{{ domaine.id }}">{{ domaine.nom
+                            }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -24,7 +26,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     {{ form.sous_domaine_id.label(class="form-label") }}
-                    {{ form.sous_domaine_id(class="form-control", id="sous-secteur-select") }}
+                    {{ form.sous_domaine_id(class="form-control",
+                    id="sous-secteur-select") }}
                 </div>
             </div>
 
@@ -33,8 +36,12 @@
                 <div class="form-group">
                     {{ form.theme_id.label(class="form-label") }}
                     <div class="d-flex">
-                        {{ form.theme_id(class="form-control", id="theme-select") }}
-                        <button type="button" class="btn btn-success btn-sm ms-2" data-bs-toggle="modal" data-bs-target="#addThemeModal">
+                        {{ form.theme_id(class="form-control",
+                        id="theme-select") }}
+                        <button type="button"
+                            class="btn btn-success btn-sm ms-2"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addThemeModal">
                             <span class="fas fa-plus"></span>
                         </button>
                     </div>
@@ -84,12 +91,23 @@
                     {% endfor %}
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.langue.label(class="form-label") }}
+                    {{ form.langue(class="form-control") }}
+                    {% for error in form.langue.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+            </div>
 
             <!-- Secteurs -->
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="secteur-select">Secteurs</label>
-                    {{ form.secteurs(class="form-control", id="secteur-select") }}
+                    {{ form.secteurs(class="form-control", id="secteur-select")
+                    }}
                     {% for error in form.secteurs.errors %}
                     <div class="text-danger">{{ error }}</div>
                     {% endfor %}
@@ -98,33 +116,43 @@
         </div>
 
         <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+            <button type="submit" class="btn btn-primary">{{ form.submit.label
+                }}</button>
         </div>
     </form>
 
     <!-- Modal pour ajouter un thème -->
-    <div class="modal fade" id="addThemeModal" tabindex="-1" aria-labelledby="addThemeModalLabel" aria-hidden="true">
+    <div class="modal fade" id="addThemeModal" tabindex="-1"
+        aria-labelledby="addThemeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addThemeModalLabel">Ajouter un Thème</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="addThemeModalLabel">Ajouter un
+                        Thème</h5>
+                    <button type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="add-theme-form">
                     {{ form.hidden_tag() }}
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="themeNom" class="form-label">Nom du Thème</label>
-                            <input type="text" class="form-control" id="themeNom" name="nom" required>
+                            <label for="themeNom" class="form-label">Nom du
+                                Thème</label>
+                            <input type="text" class="form-control"
+                                id="themeNom" name="nom" required>
                         </div>
                         <div class="mb-3">
-                            <label for="themeDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="themeDescription" name="description"></textarea>
+                            <label for="themeDescription"
+                                class="form-label">Description</label>
+                            <textarea class="form-control" id="themeDescription"
+                                name="description"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                        <button type="button" class="btn btn-secondary"
+                            data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit"
+                            class="btn btn-primary">Ajouter</button>
                     </div>
                 </form>
             </div>

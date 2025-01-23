@@ -39,6 +39,8 @@ def create_app(config_class='config.Config'):
     from .routes.admin import bp as admin_bp
 
     from .routes.reglement import bp as reglement_bp
+    from .routes.manager import bp as manager_bp
+    from .routes.veille import bp as veille_bp
 
 
 
@@ -46,6 +48,8 @@ def create_app(config_class='config.Config'):
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(reglement_bp)
+    app.register_blueprint(manager_bp)
+    app.register_blueprint(veille_bp)
 
 
     return app

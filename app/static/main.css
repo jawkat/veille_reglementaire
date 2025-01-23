@@ -119,3 +119,11 @@ background-color: var(--nomai);
   background-color: var(--nomai); /* Couleur de fond lors du survol */
   cursor: pointer; /* Change le curseur en main */
 }
+
+
+.userbox{
+
+  background-color: #fff; 
+  border-radius: 40px;
+  box-shadow: 5px 5px 25px hsla(0,0%,70%,.25) ;
+}
