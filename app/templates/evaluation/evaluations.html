@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<h3 class="mb-3">Évaluations du {{ reglementation.titre }}</h3>
+<table class="table table-bordered table-hover">
+  <thead >
+    <tr >
+      <th>N°</th>
+      <th>Titre</th>
+      <th>Article</th>
+      <th>Applicable</th>
+      <th>Conforme</th>
+      <th>Champ d'application</th>
+      <th>Commentaires</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for article in articles %}
+
+    <tr>
+      {% if article.titre %}
+      <!-- Si l'article a un titre, on fusionne les colonnes -->
+      <td colspan="8" class="font-weight-bold text-center bg-info">{{ article.titre }}</td>
+      {% endif %}
+    </tr>
+    <td>{{ article.numero }}</td>
+    <td>{{ article.titre }}</td>
+    <td>{{ article.contenu }}</td>
+    <td>
+      {% set evaluation = evaluations|selectattr("article_id", "equalto", article.id) %}
+      {{ evaluation.applicable if evaluation else "Non évalué" }}
+    </td>
+    <td>{{ evaluation.conforme if evaluation else "Non évalué" }}</td>
+    <td>{{ evaluation.champ_d_application if evaluation else "Non évalué" }}</td>
+    <td>{{ evaluation.commentaires if evaluation else "Non évalué" }}</td>
+    <td>
+      <a href="{{ url_for('veille.modifier_evaluation', evaluation_id=evaluation.id)}}"
+        class="btn btn-primary btn-sm">
+        Modifier
+      </a>
+    </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<br>
+{% endblock %}

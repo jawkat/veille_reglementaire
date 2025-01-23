@@ -58,20 +58,21 @@
                     {% for article in reglementation.articles %}
                     <tr>
                         {% if article.titre %}
-                            <!-- Si l'article a un titre, on fusionne les colonnes -->
-                            <td colspan="2" class="font-weight-bold text-center">{{ article.titre }}</td>
-                    </tr>
+                        <!-- Si l'article a un titre, on fusionne les colonnes -->
+                        <td colspan="2" class="font-weight-bold text-center">{{ article.titre }}</td>
                         {% endif %}
+                    </tr>
+
                     <tr>
                         <td>{{ article.numero }}</td>
                         <td>
                             {% for ligne in article.contenu.split('\n') %}
-                                <p>{{ ligne }}</p>
+                            <p>{{ ligne }}</p>
                             {% endfor %}
                         </td>
                     </tr>
                     {% endfor %}
-                    
+
                 </tbody>
             </table>
             {% else %}
@@ -107,13 +108,11 @@
             {% endif %}
         </div>
         <div class="card-footer d-flex justify-content-between">
-            <a
-                href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
+            <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
                 class="btn btn-success">
                 Ajouter un Article
             </a>
-            <a href="{{ url_for('reglement.liste_reglementations') }}"
-                class="btn btn-secondary">
+            <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary">
                 Retour à la liste
             </a>
         </div>

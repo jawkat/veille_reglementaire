@@ -5,32 +5,32 @@
     <h1 class="mb-3">{{ entreprise.nom }}</h1>
     <p><strong>Description :</strong> {{ entreprise.description }}</p>
     <p><strong>Pays :</strong> {{ entreprise.pays }}</p>
-    <p><strong>Date d'ajout :</strong> 
+    <p><strong>Date d'ajout :</strong>
         {{ entreprise.date_creation.strftime('%d/%m/%Y') if entreprise.date_creation else '--' }}
     </p>
-    
+
     <h2 class="mt-4">Utilisateurs associés</h2>
     {% if utilisateurs %}
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>Nom</th>
-                    <th>Email</th>
-                    <th>Rôle</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for user in utilisateurs %}
-                    <tr>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.role.value}}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Rôle</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in utilisateurs %}
+            <tr>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.role.value}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% else %}
-        <p>Aucun utilisateur n'est associé à cette entreprise.</p>
+    <p>Aucun utilisateur n'est associé à cette entreprise.</p>
     {% endif %}
 
 
@@ -38,19 +38,28 @@
     <table class="table table-bordered mt-3">
         <thead>
             <tr>
-                <th>Titre</th>
-                <th>Description</th>
+                <th>Article</th>
+                <th>type</th>
+                <th>suivi</th>
+                <th>consulter</th>
             </tr>
         </thead>
         <tbody>
             {% for entreprise_reglementation in entreprise.reglementations %}
-                <tr>
-                    <td>{{ entreprise_reglementation.reglementation.titre }}</td>
-                    <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
-                </tr>
+            <tr>
+                <td>{{ entreprise_reglementation.reglementation.titre }}</td>
+                <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
+                <td>{{ entreprise_reglementation.suivi }}</td>
+
+                <td>
+                    <a href="{{ url_for('veille.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"
+                        class="btn btn-primary btn-sm">Voir</a>
+                </td>
+
+            </tr>
             {% endfor %}
         </tbody>
     </table>
-    
+
 </div>
 {% endblock %}

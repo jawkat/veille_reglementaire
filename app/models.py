@@ -20,7 +20,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    
+
     role = db.Column(db.Enum(RoleUtilisateur), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=True)
@@ -71,7 +71,7 @@ class Entreprise(db.Model):
     __tablename__ = 'entreprise'
     id = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100), nullable=False, unique=True )
-    
+
     description = db.Column(db.Text, nullable=True)
     pays = db.Column(db.String(100), nullable=True)
 
@@ -181,8 +181,10 @@ class Evaluation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'), nullable=False)
-    applicable = db.Column(db.String(20), nullable=False)  # "Applicable", "Non Applicable"
-    conforme = db.Column(db.String(20), nullable=True)  # "Conforme", "Non Conforme"
+
+    applicable = db.Column(db.Boolean, default=True, nullable=False)
+    conforme =db.Column(db.Boolean, default=True, nullable=False)
+
     champ_d_application = db.Column(db.Text, nullable=True)  # Description du champ d'application
     commentaires = db.Column(db.Text, nullable=True)
     actions = db.relationship('Action', backref='evaluation', lazy=True)
@@ -215,4 +217,3 @@ class Audit(db.Model):
     resultat = db.Column(db.String(50), nullable=False)  # Exemple : "Conforme", "Non Conforme"
     observations = db.Column(db.Text, nullable=True)
     rapport = db.Column(db.Text, nullable=True)
-

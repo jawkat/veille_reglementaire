@@ -7,3 +7,7 @@ flask db upgrade
 flask db init
 flask db migrate -m "ajout attribution auto des reglemnatations"
 flask db upgrade
+
+flask db init
+flask db migrate -m "applicable et conforme boolein "
+flask db upgrade
