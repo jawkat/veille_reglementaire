@@ -14,6 +14,16 @@ class RoleUtilisateur(Enum):
     RESPONSABLE = "Responsable Veille"
     COLLABORATEUR = "Collaborateur"
 
+class ApplicableEnum(Enum):
+    OUI = "Oui"
+    NON_EVALUE = "Non évalué"
+    NON = "Non"
+
+class ConformeEnum(Enum):
+    CONFORME = "Conforme"
+    NON_EVALUE = "Non évalué"
+    NON_CONFORME = "Non conforme"
+
 #*************************************************************************************
 class User(db.Model, UserMixin):
     __tablename__ = 'utilisateur'
@@ -89,14 +99,35 @@ class Entreprise(db.Model):
         reglementations_existantes = {r.reglementation_id for r in self.reglementations}
 
         # Ajoutez uniquement les réglementations non associées
+
+    # Ajoutez uniquement les réglementations non associées
         for secteur in self.secteurs:
             for reglementation_secteur in secteur.reglementations:
-                if reglementation_secteur.reglementation_id not in reglementations_existantes:
+                reglementation_id = reglementation_secteur.reglementation_id
+                if reglementation_id not in reglementations_existantes:
+                    # Ajouter la réglementation à l'entreprise
                     entreprise_reglementation = EntrepriseReglementation(
                         entreprise_id=self.id,
-                        reglementation_id=reglementation_secteur.reglementation_id
+                        reglementation_id=reglementation_id
                     )
                     db.session.add(entreprise_reglementation)
+
+                    # Créer les évaluations par défaut pour les articles de cette réglementation
+                    reglementation = Reglementation.query.get(reglementation_id)
+                    if reglementation:
+                        for article in reglementation.articles:
+                            evaluation_existante = Evaluation.query.filter_by(
+                                entreprise_id=self.id,
+                                article_id=article.id
+                            ).first()
+                            if not evaluation_existante:
+                                evaluation = Evaluation(
+                                    entreprise_id=self.id,
+                                    article_id=article.id,
+                                    applicable=ApplicableEnum.NON_EVALUE,
+                                    conforme=ConformeEnum.NON_EVALUE
+                                )
+                                db.session.add(evaluation)
 
 
 class ReglementationSecteur(db.Model):
@@ -148,8 +179,44 @@ class EntrepriseReglementation(db.Model):
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
     reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
     suivi = db.Column(db.Boolean, default=True, nullable=False)  # Permet de savoir si l'entreprise suit cette réglementation
+    score = db.Column(db.Integer, default=0, nullable=True)
 
     reglementation = db.relationship('Reglementation', backref='entreprises_associees')
+
+
+    def mettre_a_jour_score(self):
+        """
+        Met à jour le score basé sur les évaluations des articles de la réglementation pour cette entreprise.
+        """
+        # Obtenir la réglementation liée à cette instance d'EntrepriseReglementation
+        reglementation = self.reglementation
+
+        # Initialiser les compteurs pour les articles applicables et conformes
+        total_applicable = 0
+        total_conforme = 0
+
+        # Parcourir tous les articles de la réglementation
+        for article in reglementation.articles:
+            # Vérifier si l'article a des évaluations
+            if article.evaluations:
+                # Parcourir toutes les évaluations pour cet article
+                for evaluation in article.evaluations:
+                    # Vérifier si l'évaluation est applicable pour cette entreprise
+                    if evaluation.entreprise_id == self.entreprise_id and evaluation.applicable.name == "OUI":
+                        total_applicable += 1  # L'article est applicable
+                        if evaluation.conforme.name == "CONFORME":
+                            total_conforme += 1  # L'article est conforme
+
+        # Calculer le score
+        if total_applicable == 0:
+            self.score = 0  # Éviter la division par zéro
+        else:
+            self.score = round((total_conforme / total_applicable) * 100)
+
+        # Sauvegarder le score dans la base de données
+        db.session.commit()
+
+
 
 class Theme(db.Model):
     __tablename__ = 'theme'
@@ -182,12 +249,14 @@ class Evaluation(db.Model):
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'), nullable=False)
 
-    applicable = db.Column(db.Boolean, default=True, nullable=False)
-    conforme =db.Column(db.Boolean, default=True, nullable=False)
-
+    applicable = db.Column(db.Enum(ApplicableEnum), nullable=True, default=ApplicableEnum.NON_EVALUE)
+    conforme = db.Column(db.Enum(ConformeEnum), nullable=True, default=ConformeEnum.NON_EVALUE)
+    
     champ_d_application = db.Column(db.Text, nullable=True)  # Description du champ d'application
     commentaires = db.Column(db.Text, nullable=True)
     actions = db.relationship('Action', backref='evaluation', lazy=True)
+
+
 
 class Action(db.Model):
     __tablename__ = 'action'

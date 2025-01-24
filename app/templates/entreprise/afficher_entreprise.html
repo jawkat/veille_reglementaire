@@ -41,6 +41,7 @@
                 <th>Article</th>
                 <th>type</th>
                 <th>suivi</th>
+                <th>Score</th>
                 <th>consulter</th>
             </tr>
         </thead>
@@ -50,6 +51,7 @@
                 <td>{{ entreprise_reglementation.reglementation.titre }}</td>
                 <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
                 <td>{{ entreprise_reglementation.suivi }}</td>
+                <td>{{ entreprise_reglementation.score }}</td>
 
                 <td>
                     <a href="{{ url_for('veille.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"

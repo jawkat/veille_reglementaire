@@ -11,3 +11,7 @@ flask db upgrade
 flask db init
 flask db migrate -m "applicable et conforme boolein "
 flask db upgrade
+
+
+flask db migrate -m "add score "
+flask db upgrade

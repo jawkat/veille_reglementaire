@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h3 class="mb-3">Modifier l'évaluation</h3>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+        <label for="applicable">Applicable</label>
+        {{ form.applicable(class="form-control") }}
+    </div>
+
+    <div class="form-group">
+        <label for="conforme">Conforme</label>
+        {{ form.conforme(class="form-control") }}
+    </div>
+
+    <div class="form-group">
+        <label for="conforme">Champ d'application</label>
+        {{ form.champ_d_application(class="form-control") }}
+    </div>
+
+
+    <div class="form-group">
+        <label for="commentaires">Commentaires</label>
+        {{ form.commentaires(class="form-control", rows=3) }}
+    </div>
+
+    <button type="submit" class="btn btn-primary">{{ form.submit.label }}</button>
+    <a href="{{ url_for('veille.afficher_evaluations', 
+        reglementation_id=evaluation.article.reglementation_id, 
+        entreprise_id=evaluation.entreprise_id) }}" 
+        class="btn btn-secondary">
+        Annuler
+    </a>
+</form>
+{% endblock %}

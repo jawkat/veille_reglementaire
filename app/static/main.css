@@ -121,9 +121,10 @@ background-color: var(--nomai);
 }
 
 
-.userbox{
 
-  background-color: #fff; 
-  border-radius: 40px;
-  box-shadow: 5px 5px 25px hsla(0,0%,70%,.25) ;
+/* Simuler un champ désactivé */
+.input-disabled {
+  background-color: #d6d8db;  /* Fond gris clair */
+  pointer-events: none;        /* Empêche l'interaction */
+  color: #6c757d;              /* Texte gris */
 }

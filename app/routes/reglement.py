@@ -426,7 +426,7 @@ def ajouter_entreprise_et_manager():
         manager_user.set_password(user_form.password.data)
         db.session.add(manager_user)
         db.session.commit()
-        flash('Utilisateur avec rôle manager ajouté avec succès.', 'success')
+        flash('l\'Utilisateur ajouté avec succès.', 'success')
 
         return redirect(url_for('reglement.liste_entreprises'))
 

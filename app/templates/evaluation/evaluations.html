@@ -1,49 +1,78 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<h4 class="py-3 text-center">Évaluations de la réglementation "{{ reglementation.titre }}"</h4>
 
-<h3 class="mb-3">Évaluations du {{ reglementation.titre }}</h3>
-<table class="table table-bordered table-hover">
-  <thead >
-    <tr >
-      <th>N°</th>
-      <th>Titre</th>
-      <th>Article</th>
-      <th>Applicable</th>
-      <th>Conforme</th>
-      <th>Champ d'application</th>
-      <th>Commentaires</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for article in articles %}
+{% if suivi %}
+  {% if articles %}
+    <div class="accordion" id="accordionArticles">
+      {% for article in articles %}
+        {% set evaluation = evaluations_dict.get(article.id) %}
 
-    <tr>
-      {% if article.titre %}
-      <!-- Si l'article a un titre, on fusionne les colonnes -->
-      <td colspan="8" class="font-weight-bold text-center bg-info">{{ article.titre }}</td>
-      {% endif %}
-    </tr>
-    <td>{{ article.numero }}</td>
-    <td>{{ article.titre }}</td>
-    <td>{{ article.contenu }}</td>
-    <td>
-      {% set evaluation = evaluations|selectattr("article_id", "equalto", article.id) %}
-      {{ evaluation.applicable if evaluation else "Non évalué" }}
-    </td>
-    <td>{{ evaluation.conforme if evaluation else "Non évalué" }}</td>
-    <td>{{ evaluation.champ_d_application if evaluation else "Non évalué" }}</td>
-    <td>{{ evaluation.commentaires if evaluation else "Non évalué" }}</td>
-    <td>
-      <a href="{{ url_for('veille.modifier_evaluation', evaluation_id=evaluation.id)}}"
-        class="btn btn-primary btn-sm">
-        Modifier
-      </a>
-    </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-<br>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="heading{{ loop.index }}">
+            <div class="d-flex align-items-center justify-content-between w-100">
+              
+              <!-- Bouton de l'accordéon -->
+              <button class="accordion-button flex-grow-1 text-start me-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                Article N°{{ article.numero }} - {{ article.titre or 'Titre non spécifié' }}
+                
+                <!-- Affichage des badges -->
+                {% if evaluation %}
+                  <span class="ms-3">
+                    {% if evaluation.applicable.name == "OUI" %}
+                      <span class="badge bg-success" title="Applicable: Oui">Applicable: Oui</span>
+                    {% elif evaluation.applicable.name == "NON" %}
+                      <span class="badge bg-danger" title="Applicable: Non">Applicable: Non</span>
+                    {% else %}
+                      <span class="badge bg-secondary" title="Applicable: Non évalué">Applicable: Non évalué</span>
+                    {% endif %}
+                  </span>
+                  <span class="ms-2">
+                    {% if evaluation.conforme.name == "CONFORME" %}
+                      <span class="badge bg-success" title="Conforme: Conforme">Conforme: Conforme</span>
+                    {% elif evaluation.conforme.name == "NON_CONFORME" %}
+                      <span class="badge bg-danger" title="Conforme: Non conforme">Conforme: Non conforme</span>
+                    {% else %}
+                      <span class="badge bg-secondary" title="Conforme: Non évalué">Conforme: Non évalué</span>
+                    {% endif %}
+                  </span>
+                {% endif %}
+              </button>
+              
+              <!-- Bouton Modifier -->
+              <a href="{{ url_for('veille.modifier_evaluation', evaluation_id=evaluation.id) }}" class="btn btn-warning">
+                Modifier
+              </a>
+            </div>
+          </h2>
+        
+          <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionArticles">
+            <div class="accordion-body">
+              <!-- Contenu de l'article -->
+              <p><strong>Contenu:</strong></p>
+              {% for ligne in article.contenu.split('\n') %}
+                <p>{{ ligne }}</p>
+              {% endfor %}
+              {% if evaluation %}
+                <p><strong>Champ d'application:</strong> {{ evaluation.champ_d_application if evaluation.champ_d_application else "Non spécifié" }}</p>
+                <p><strong>Commentaires:</strong> {{ evaluation.commentaires if evaluation.commentaires else "RAS" }}</p>
+              {% else %}
+                <p><em>Aucune évaluation disponible pour cet article.</em></p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        
+
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <p>Aucun article associé à cette réglementation.</p>
+  {% endif %}
+{% else %}
+  <p>L'entreprise ne suit pas cette réglementation.</p>
+{% endif %}
+
 {% endblock %}
