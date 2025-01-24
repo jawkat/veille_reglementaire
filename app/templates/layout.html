@@ -41,42 +41,42 @@
                 Reglementations
               </a>
             </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint.startswith('ingredient.') else '' }}"
-                href="#" id=" entrepriseDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Administration
-              </a>
-              <ul class="dropdown-menu">
 
-                <li><a class="dropdown-item" href="{{ url_for('reglement.ajouter_entreprise_et_manager') }}">Ajout
-                    Entreprise</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_entreprises') }}">Liste E/S</a></li>
-                <li><a class="dropdown-item" href="#">vide</a></li>
-              </ul>
+            <li class="nav-item">
+              <a class="nav-link text-white" href="{{ url_for('reglement.afficher_entreprise', entreprise_id=current_user.entreprise_id) }}">
+                Veille
+              </a>
             </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint.startswith('ingredient.') else '' }}"
-                href="#" id="secteurDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Parametre
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_secteurs') }}">Secteurs</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_domaines') }}">Domaines</a></li>
-                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_sous_domaines') }}">Sous-Domaines</a>
-                </li>
-
-              </ul>
-
-
-
 
 
             <li class="nav-item">
               <a class="nav-link text-white"
                 href="{{ url_for('manager.liste_utilisateurs', entreprise_id=current_user.entreprise.id) }}">
-                Utilisateurs de {{ current_user.entreprise.nom }}
+                Admin
               </a>
             </li>
+
+
+
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle {{ 'active' if request.endpoint.startswith('ingredient.') else '' }}"
+                href="#" id=" entrepriseDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Super Admin
+              </a>
+              <ul class="dropdown-menu">
+  
+                <li><a class="dropdown-item" href="{{ url_for('reglement.ajouter_entreprise_et_manager') }}">Ajout
+                    Entreprise</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_entreprises') }}">Liste E/S</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_secteurs') }}">Secteurs</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_domaines') }}">Domaines</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('reglement.liste_sous_domaines') }}">Sous-Domaines</a></li>
+                <li><a class="dropdown-item" href="#">vide</a></li>
+              </ul>
+            </li>
+
+
 
             <li class="nav-item">
               <a class="nav-link text-white" href="{{ url_for('admin.logout') }}">Logout {{
@@ -84,6 +84,9 @@
             </li>
 
           </ul>
+
+
+
 
         </div>
       </div>

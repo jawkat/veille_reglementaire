@@ -457,3 +457,15 @@ def liste_entreprises():
     # Récupérer toutes les entreprises
     entreprises = Entreprise.query.all()
     return render_template('entreprise/liste_entreprises.html', entreprises=entreprises)
+
+
+@bp.route('/entreprise', methods=['GET'])
+@login_required
+def afficher_entreprise_pour_utilisateur():
+    # Vérifier si l'utilisateur est associé à une entreprise
+    if current_user.entreprise_id:
+        entreprise_id = current_user.entreprise_id
+        return redirect(url_for('reglement.afficher_entreprise', entreprise_id=entreprise_id))
+    else:
+        flash('Aucune entreprise associée à votre compte.', 'danger')
+        return redirect(url_for('main.index'))  # Ou vers une autre page d'accueil
