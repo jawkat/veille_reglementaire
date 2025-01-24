@@ -54,7 +54,7 @@
                 <td>{{ entreprise_reglementation.score }}</td>
 
                 <td>
-                    <a href="{{ url_for('veille.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"
+                    <a href="{{ url_for('evaluation.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"
                         class="btn btn-primary btn-sm">Voir</a>
                 </td>
 

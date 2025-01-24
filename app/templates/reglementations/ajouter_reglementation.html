@@ -26,8 +26,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     {{ form.sous_domaine_id.label(class="form-label") }}
-                    {{ form.sous_domaine_id(class="form-control",
-                    id="sous-secteur-select") }}
+                    {{ form.sous_domaine_id(class="form-control", id="sous-secteur-select") }}
                 </div>
             </div>
 
@@ -159,5 +158,34 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const domaineSelect = document.getElementById('secteur-select');
+        const sousDomaineSelect = document.getElementById('sous-secteur-select');
+
+        domaineSelect.addEventListener('change', function () {
+            const domaineId = this.value;
+
+            // Effacer les options actuelles
+            sousDomaineSelect.innerHTML = '<option value="">Sélectionnez un sous-domaine</option>';
+
+            if (domaineId) {
+                // Requête AJAX pour récupérer les sous-domaines
+                fetch(`/get_sous_domaines/${domaineId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(sousDomaine => {
+                            const option = document.createElement('option');
+                            option.value = sousDomaine.id;
+                            option.textContent = sousDomaine.nom;
+                            sousDomaineSelect.appendChild(option);
+                        });
+                    })
+                    .catch(error => console.error('Erreur lors du chargement des sous-domaines:', error));
+            }
+        });
+    });
+</script>
 
 {% endblock %}

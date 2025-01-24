@@ -13,7 +13,7 @@ from flask_login import login_required, current_user
 from app.routes.admin import role_required
 
 
-bp = Blueprint('veille', __name__)
+bp = Blueprint('evaluation', __name__)
 
 @bp.route('/evaluations/<int:reglementation_id>/<int:entreprise_id>')
 def afficher_evaluations(reglementation_id, entreprise_id):
@@ -41,6 +41,8 @@ def afficher_evaluations(reglementation_id, entreprise_id):
 
     # Vérifier si la relation existe et récupérer la valeur de suivi
     suivi = entreprise_reglementation.suivi if entreprise_reglementation else None
+    score = entreprise_reglementation.score if entreprise_reglementation else None
+
 
     # Rendu du modèle
     return render_template(
@@ -49,7 +51,8 @@ def afficher_evaluations(reglementation_id, entreprise_id):
         articles=articles,
         evaluations_dict=evaluations_dict,
         entreprise_id=entreprise_id,
-        suivi=suivi
+        suivi=suivi,
+        score=score
     )
 
 
@@ -86,7 +89,7 @@ def modifier_evaluation(evaluation_id):
         # Sauvegarder les modifications dans la base de données
         try:
             db.session.commit()
-            
+
            # Obtenir l'instance de EntrepriseReglementation associée et mettre à jour le score
             entreprise_reglementation = EntrepriseReglementation.query.filter_by(
                 reglementation_id=evaluation.article.reglementation_id,
@@ -98,8 +101,8 @@ def modifier_evaluation(evaluation_id):
 
 
             flash('Évaluation modifiée avec succès.', 'success')
-            return redirect(url_for('veille.afficher_evaluations', 
-                                    reglementation_id=evaluation.article.reglementation_id, 
+            return redirect(url_for('evaluation.afficher_evaluations',
+                                    reglementation_id=evaluation.article.reglementation_id,
                                     entreprise_id=evaluation.entreprise_id))
         except Exception as e:
             db.session.rollback()

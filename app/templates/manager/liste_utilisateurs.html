@@ -2,15 +2,21 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<h2>Utilisateurs de l'entreprise : {{ entreprise.nom }}</h2>
-<a class="btn btn-success" href="{{ url_for('manager.ajouter_utilisateur',entreprise_id=entreprise.id) }}">
-    <span class="fas fa-plus fa-2x"></span></a>
+<div class="d-flex justify-content-between">
+    <h2>Management des Utilisateurs</h2>
+    <a class="btn btn-success" href="{{ url_for('manager.ajouter_utilisateur',entreprise_id=entreprise.id) }}">
+        <span class="fas fa-plus fa-2x"></span></a>
+
+
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>Nom</th>
             <th>Email</th>
             <th>Rôle</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -19,6 +25,12 @@
             <td>{{ utilisateur.name }}</td>
             <td>{{ utilisateur.email }}</td>
             <td>{{ utilisateur.role.name }}</td>
+            <td>
+                <a href="{{ url_for('manager.modifier_utilisateur', entreprise_id=entreprise.id, user_id=utilisateur.id) }}" class="btn btn-warning btn-sm">Modifier</a>
+                <form method="post" action="{{ url_for('manager.supprimer_utilisateur', entreprise_id=entreprise.id, user_id=utilisateur.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?');">Supprimer</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>

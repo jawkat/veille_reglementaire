@@ -15,3 +15,5 @@ flask db upgrade
 
 flask db migrate -m "add score "
 flask db upgrade
+
+flask db migrate -m "tester uuid"

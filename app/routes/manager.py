@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, date
 from functools import wraps
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,request, abort
-from app.models import  (User, Secteur, Domaine, 
+from app.models import  (User, Secteur, Domaine,
         SousDomaine, Reglementation,Theme, ReglementationSecteur,
         VersionReglementation, Article, Entreprise, EntrepriseSecteur)
 from app import db
@@ -32,7 +32,7 @@ class UserForm(FlaskForm):
 def liste_utilisateurs(entreprise_id):
     # Vérifier si l'entreprise existe et appartient au manager connecté
     entreprise = Entreprise.query.filter_by(id=entreprise_id).first()
-    
+
     if entreprise is None or entreprise.id != current_user.entreprise_id:
         abort(404)  # Retourner une erreur 404 si l'entreprise n'existe pas ou si l'utilisateur n'y a pas accès
 
@@ -81,3 +81,53 @@ def ajouter_utilisateur(entreprise_id):
         return redirect(url_for('manager.liste_utilisateurs', entreprise_id=entreprise.id))
 
     return render_template('manager/ajouter_utilisateur.html', entreprise=entreprise, user_form=user_form)
+
+
+# Modifier un utilisateur
+@bp.route('/entreprise/<int:entreprise_id>/modifier_utilisateur/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@role_required(['ADMIN', 'MANAGER'])
+def modifier_utilisateur(entreprise_id, user_id):
+    entreprise = Entreprise.query.get_or_404(entreprise_id)
+    utilisateur = User.query.get_or_404(user_id)
+
+    # Vérification de l'accès
+    if utilisateur.entreprise_id != entreprise_id:
+        abort(403)
+
+    user_form = UserForm(obj=utilisateur)  # Préremplir le formulaire avec les données de l'utilisateur
+
+    if user_form.validate_on_submit():
+        existant_email = User.query.filter(User.email == user_form.email.data, User.id != utilisateur.id).first()
+        if existant_email:
+            flash("Cet email est déjà utilisé par un autre utilisateur.", "danger")
+            return render_template('manager/modifier_utilisateur.html', entreprise=entreprise, user_form=user_form)
+
+        utilisateur.name = user_form.name.data
+        utilisateur.email = user_form.email.data
+        utilisateur.role = user_form.role.data
+        if user_form.password.data.strip():  # Met à jour le mot de passe uniquement s'il est fourni
+            utilisateur.set_password(user_form.password.data)
+
+        db.session.commit()
+        flash("Les informations de l'utilisateur ont été modifiées avec succès.", 'success')
+        return redirect(url_for('manager.liste_utilisateurs', entreprise_id=entreprise.id))
+
+    return render_template('manager/modifier_utilisateur.html', entreprise=entreprise, user_form=user_form)
+
+# Supprimer un utilisateur
+@bp.route('/entreprise/<int:entreprise_id>/supprimer_utilisateur/<int:user_id>', methods=['POST'])
+@login_required
+@role_required(['ADMIN', 'MANAGER'])
+def supprimer_utilisateur(entreprise_id, user_id):
+    entreprise = Entreprise.query.get_or_404(entreprise_id)
+    utilisateur = User.query.get_or_404(user_id)
+
+    # Vérification de l'accès
+    if utilisateur.entreprise_id != entreprise_id:
+        abort(403)
+
+    db.session.delete(utilisateur)
+    db.session.commit()
+    flash("L'utilisateur a été supprimé avec succès.", 'success')
+    return redirect(url_for('manager.liste_utilisateurs', entreprise_id=entreprise.id))

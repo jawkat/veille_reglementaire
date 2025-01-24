@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta, date
 from functools import wraps
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,request
-from app.models import  (User, Secteur, Domaine, 
+from app.models import  (User, Secteur, Domaine,
         SousDomaine, Reglementation,Theme, ReglementationSecteur,
         VersionReglementation, Article, Entreprise, EntrepriseSecteur)
 from app import db
@@ -31,7 +31,7 @@ def ajouter_secteur():
         if secteur_existant:
             flash("Un secteur avec ce nom existe déjà.", "danger")
             return redirect(url_for('reglement.ajouter_secteur'))
-        
+
         # Créer un nouveau secteur
         nouveau_secteur = Secteur(
             nom=form.nom.data,
@@ -41,7 +41,7 @@ def ajouter_secteur():
         db.session.commit()
         flash("Secteur créé avec succès !", "success")
         return redirect(url_for('reglement.liste_secteurs'))
-    
+
     return render_template('secteur/ajouter_secteur.html', form=form)
 
 @bp.route('/secteurs', methods=['GET'])
@@ -53,7 +53,7 @@ def liste_secteurs():
 
 class DomaineForm(FlaskForm):
     nom = StringField('Nom du Domaine', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[DataRequired()])
+    description = TextAreaField('Description')
     submit = SubmitField('Ajouter Domaine')
 
 
@@ -88,7 +88,7 @@ def liste_domaines():
 
 class SousDomaineForm(FlaskForm):
     nom = StringField('Nom du Sous-Domaine', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[DataRequired()])
+    description = TextAreaField('Description')
     domaine_id = SelectField('Domaine', coerce=int, validators=[DataRequired()])
     submit = SubmitField('Ajouter Sous-Domaine')
 
@@ -98,8 +98,8 @@ def ajouter_sous_domaine():
     form.domaine_id.choices = [(d.id, d.nom) for d in Domaine.query.all()]
     if form.validate_on_submit():
         sous_domaine = SousDomaine(
-            nom=form.nom.data, 
-            description=form.description.data, 
+            nom=form.nom.data,
+            description=form.description.data,
             domaine_id=form.domaine_id.data
         )
         db.session.add(sous_domaine)
@@ -173,7 +173,7 @@ def ajouter_reglementation():
 
         submitted_sous_domaine = form.sous_domaine_id.data
         valid_choices = [choice[0] for choice in form.sous_domaine_id.choices]
-        
+
 
         if submitted_sous_domaine not in valid_choices:
             flash("Sous-domaine sélectionné invalide.", "danger")
@@ -202,7 +202,7 @@ def ajouter_reglementation():
 
 
             secteurs_selectionnes = request.form.getlist('secteurs')
-        
+
             for secteur_id in secteurs_selectionnes:
                 reglementation_secteur = ReglementationSecteur(
                     reglementation_id=reglementation.id,
@@ -214,7 +214,7 @@ def ajouter_reglementation():
 
             flash("Réglementation ajoutée avec succès.", "success")
             return redirect(url_for('reglement.liste_reglementations'))
-        
+
 
     return render_template('reglementations/ajouter_reglementation.html', form=form, domaines=domaines,
                 secteurs=secteurs, selected_secteurs=form.secteurs.data)
@@ -240,7 +240,7 @@ def liste_reglementations():
     try:
         # Récupérer toutes les réglementations
         reglementations = Reglementation.query.all()
-    
+
         # Vérifier si des réglementations existent
         if not reglementations:
             flash("Aucune réglementation n'est disponible.", "warning")
@@ -261,7 +261,7 @@ def detail_reglementation(id):
     sous_domaine = SousDomaine.query.get(reglementation.sous_domaine_id)
 
     # Récupérer les secteurs associés à la réglementation
-    secteurs = [secteur for secteur in 
+    secteurs = [secteur for secteur in
                 (ReglementationSecteur.query.filter_by(reglementation_id=id)
                 .join(Secteur, Secteur.id == ReglementationSecteur.secteur_id)
                 .all())]
@@ -312,9 +312,9 @@ class ArticleForm(FlaskForm):
 def ajouter_article(reglementation_id):
     # Récupérer la réglementation pour afficher ses informations dans le formulaire
     reglementation = Reglementation.query.get_or_404(reglementation_id)
-    
+
     form = ArticleForm()
-    
+
 
     if form.validate_on_submit():
         # Créer un nouvel article lié à la réglementation
@@ -324,7 +324,7 @@ def ajouter_article(reglementation_id):
             contenu=form.contenu.data,
             reglementation_id=reglementation.id
         )
-        
+
         # Ajouter l'article à la session et commettre
         db.session.add(article)
         db.session.commit()

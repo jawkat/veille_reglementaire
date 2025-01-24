@@ -1,4 +1,5 @@
 from . import db
+from uuid import uuid4
 from datetime import datetime
 from enum import Enum
 from sqlalchemy.orm import relationship
@@ -18,6 +19,7 @@ class ApplicableEnum(Enum):
     OUI = "Oui"
     NON_EVALUE = "Non évalué"
     NON = "Non"
+    INFO = "Information"
 
 class ConformeEnum(Enum):
     CONFORME = "Conforme"
@@ -27,7 +29,7 @@ class ConformeEnum(Enum):
 #*************************************************************************************
 class User(db.Model, UserMixin):
     __tablename__ = 'utilisateur'
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
     name = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
 
@@ -251,7 +253,7 @@ class Evaluation(db.Model):
 
     applicable = db.Column(db.Enum(ApplicableEnum), nullable=True, default=ApplicableEnum.NON_EVALUE)
     conforme = db.Column(db.Enum(ConformeEnum), nullable=True, default=ConformeEnum.NON_EVALUE)
-    
+
     champ_d_application = db.Column(db.Text, nullable=True)  # Description du champ d'application
     commentaires = db.Column(db.Text, nullable=True)
     actions = db.relationship('Action', backref='evaluation', lazy=True)

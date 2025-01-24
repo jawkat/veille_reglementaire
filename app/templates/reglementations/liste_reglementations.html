@@ -21,6 +21,7 @@
                     <th>Titre</th>
                     <th>Date de Texte</th>
                     <th>Source</th>
+                    <th>Secteurs</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,6 +36,12 @@
                         <td>{{ reglementation.titre }}</td>
                         <td>{{ reglementation.date_publication }}</td>
                         <td>{{ reglementation.source }}</td>
+                        <td>{% for secteur in reglementation.secteurs  %}
+
+                                <p>{{ secteur.secteur.nom }}</p>
+
+
+                        {% endfor %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h4 class="py-3 text-center">Évaluations de la réglementation "{{ reglementation.titre }}"</h4>
+<h4 class="text-center">Évaluations de la réglementation "{{ reglementation.titre }}"</h4>
+<div class="text-end w-100">Score : {{ score }}</div>
 
 {% if suivi %}
   {% if articles %}
@@ -12,11 +13,11 @@
         <div class="accordion-item">
           <h2 class="accordion-header" id="heading{{ loop.index }}">
             <div class="d-flex align-items-center justify-content-between w-100">
-              
+
               <!-- Bouton de l'accordéon -->
               <button class="accordion-button flex-grow-1 text-start me-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
                 Article N°{{ article.numero }} - {{ article.titre or 'Titre non spécifié' }}
-                
+
                 <!-- Affichage des badges -->
                 {% if evaluation %}
                   <span class="ms-3">
@@ -24,6 +25,8 @@
                       <span class="badge bg-success" title="Applicable: Oui">Applicable: Oui</span>
                     {% elif evaluation.applicable.name == "NON" %}
                       <span class="badge bg-danger" title="Applicable: Non">Applicable: Non</span>
+                    {% elif evaluation.applicable.name == "INFO" %}
+                      <span class="badge bg-primary" title="Applicable: Non">Applicable: Information</span>
                     {% else %}
                       <span class="badge bg-secondary" title="Applicable: Non évalué">Applicable: Non évalué</span>
                     {% endif %}
@@ -39,14 +42,14 @@
                   </span>
                 {% endif %}
               </button>
-              
+
               <!-- Bouton Modifier -->
-              <a href="{{ url_for('veille.modifier_evaluation', evaluation_id=evaluation.id) }}" class="btn btn-warning">
+              <a href="{{ url_for('evaluation.modifier_evaluation', evaluation_id=evaluation.id) }}" class="btn btn-warning">
                 Modifier
               </a>
             </div>
           </h2>
-        
+
           <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionArticles">
             <div class="accordion-body">
               <!-- Contenu de l'article -->
@@ -63,7 +66,7 @@
             </div>
           </div>
         </div>
-        
+
 
       {% endfor %}
     </div>

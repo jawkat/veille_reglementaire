@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container">
+    <h1>Modifier l'utilisateur</h1>
+    <form method="post" action="">
+        {{ user_form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ user_form.name.label(class="form-label") }}
+            {{ user_form.name(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ user_form.email.label(class="form-label") }}
+            {{ user_form.email(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ user_form.role.label(class="form-label") }}
+            {{ user_form.role(class="form-select") }}
+        </div>
+
+        <div class="form-group">
+            {{ user_form.password.label(class="form-label") }}
+            {{ user_form.password(class="form-control", placeholder="Laissez vide pour ne pas modifier le mot de passe") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Modifier</button>
+        <a href="{{ url_for('manager.liste_utilisateurs', entreprise_id=entreprise.id) }}" class="btn btn-secondary mt-3">Annuler</a>
+    </form>
+</div>
+{% endblock %}
