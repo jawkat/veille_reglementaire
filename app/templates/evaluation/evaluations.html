@@ -40,13 +40,16 @@
                       <span class="badge bg-secondary" title="Conforme: Non évalué">Conforme: Non évalué</span>
                     {% endif %}
                   </span>
-                {% endif %}
               </button>
 
               <!-- Bouton Modifier -->
+              {% if evaluation %}
               <a href="{{ url_for('evaluation.modifier_evaluation', evaluation_id=evaluation.id) }}" class="btn btn-warning">
                 Modifier
               </a>
+              {% endif %}
+                {% endif %}
+
             </div>
           </h2>
 

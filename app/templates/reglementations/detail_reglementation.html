@@ -5,6 +5,17 @@
     <div class="card mt-3">
         <div class="card-header">
             <h3>{{ reglementation.titre }}</h3>
+            <div class="">
+                {% if reglementation.id in suivi_map %}
+                {% if suivi_map[reglementation.id] %}
+                    <span class="badge bg-success">Suivi</span>
+                {% else %}
+                    <span class="badge bg-danger">Non suivi</span>
+                {% endif %}
+            {% else %}
+                <span class="badge bg-secondary">Inconnu</span>
+            {% endif %}
+            </div>
         </div>
         <div class="card-body">
 
@@ -24,6 +35,8 @@
                     {% else %}
                     <p><strong>Version :</strong> Aucune version disponible</p>
                     {% endif %}
+
+
 
                 </div>
                 <div class="col-md-6">
@@ -108,10 +121,13 @@
             {% endif %}
         </div>
         <div class="card-footer d-flex justify-content-between">
+            {% if current_user.is_authenticated and current_user.role.name == 'ADMIN' %}
             <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
                 class="btn btn-success">
                 Ajouter un Article
             </a>
+        {% endif %}
+        
             <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary">
                 Retour à la liste
             </a>

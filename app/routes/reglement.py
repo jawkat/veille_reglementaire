@@ -3,7 +3,7 @@ from functools import wraps
 from flask import Blueprint, render_template, flash, redirect, url_for, jsonify,request
 from app.models import  (User, Secteur, Domaine,
         SousDomaine, Reglementation,Theme, ReglementationSecteur,
-        VersionReglementation, Article, Entreprise, EntrepriseSecteur)
+        VersionReglementation, Article, Entreprise, EntrepriseSecteur, EntrepriseReglementation)
 from app import db
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SubmitField,SelectField,DateField,SelectMultipleField, EmailField
@@ -245,8 +245,14 @@ def liste_reglementations():
         if not reglementations:
             flash("Aucune réglementation n'est disponible.", "warning")
             return render_template('reglementations/liste_reglementations.html', reglementations=[])
+        
+        # Ajouter le statut de suivi pour chaque réglementation
+        suivi_map = {
+            reg.reglementation_id: reg.suivi
+            for reg in EntrepriseReglementation.query.filter_by(entreprise_id=current_user.entreprise_id).all()
+        }
 
-        return render_template('reglementations/liste_reglementations.html', reglementations=reglementations)
+        return render_template('reglementations/liste_reglementations.html', reglementations=reglementations, suivi_map=suivi_map)
     except Exception as e:
         flash(f"Erreur lors de la récupération des réglementations : {str(e)}", "danger")
         return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
@@ -256,6 +262,12 @@ def liste_reglementations():
 @bp.route('/reglementation/<int:id>', methods=['GET'])
 def detail_reglementation(id):
     reglementation = Reglementation.query.get_or_404(id)
+
+    # Ajouter le statut de suivi pour chaque réglementation
+    suivi_map = {
+        reg.reglementation_id: reg.suivi
+        for reg in EntrepriseReglementation.query.filter_by(entreprise_id=current_user.entreprise_id).all()
+    }
 
     theme = Theme.query.get(reglementation.theme_id)
     sous_domaine = SousDomaine.query.get(reglementation.sous_domaine_id)
@@ -270,11 +282,13 @@ def detail_reglementation(id):
             reglementation=reglementation,
             theme=theme,
             sous_domaine=sous_domaine,
-            secteurs=secteurs)
+            secteurs=secteurs,
+            suivi_map=suivi_map)
 
 
 
 @bp.route('/ajouter-theme', methods=['POST'])
+@role_required(['ADMIN'])
 def ajouter_theme():
     try:
         data = request.get_json()
@@ -308,7 +322,10 @@ class ArticleForm(FlaskForm):
 
     submit = SubmitField('Ajouter Article')
 
+
+
 @bp.route('/ajouter-article/<int:reglementation_id>', methods=['GET', 'POST'])
+@role_required(['ADMIN'])
 def ajouter_article(reglementation_id):
     # Récupérer la réglementation pour afficher ses informations dans le formulaire
     reglementation = Reglementation.query.get_or_404(reglementation_id)
@@ -363,7 +380,7 @@ class UserForm(FlaskForm):
 
 
 @bp.route('/ajouter_entreprise_et_manager', methods=['GET', 'POST'])
-@login_required
+@role_required(['ADMIN'])
 def ajouter_entreprise_et_manager():
     entreprise_form = EntrepriseForm()
     user_form = UserForm()
@@ -452,7 +469,7 @@ def afficher_entreprise(entreprise_id):
 
 
 @bp.route('/entreprises', methods=['GET'])
-@login_required
+@role_required(['ADMIN'])
 def liste_entreprises():
     # Récupérer toutes les entreprises
     entreprises = Entreprise.query.all()

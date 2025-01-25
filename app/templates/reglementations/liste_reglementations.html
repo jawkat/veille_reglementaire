@@ -4,52 +4,69 @@
 <div class="container mt-1">
     <div class="d-flex justify-content-between">
         <h1>Liste des Réglementations</h1>
-        <a class="btn btn-success" href="{{ url_for('reglement.ajouter_reglementation') }}">
+        <a class="btn btn-success"
+            href="{{ url_for('reglement.ajouter_reglementation') }}">
             <span class="fas fa-plus fa-2x"></span></a>
     </div>
 
     {% if reglementations %}
-        <table class="table table-striped table-hover mt-1">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Domaine</th>
-                    <th>Sous-Domaine</th>
-                    <th>Thème</th>
+    <table class="table table-striped table-hover mt-1">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Domaine</th>
+                <th>Sous-Domaine</th>
+                <th>Thème</th>
 
-                    <th>Type de Texte</th>
-                    <th>Titre</th>
-                    <th>Date de Texte</th>
-                    <th>Source</th>
-                    <th>Secteurs</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for reglementation in reglementations %}
-                <tr onclick="window.location.href='{{ url_for('reglement.detail_reglementation', id=reglementation.id) }}'"
+                <th>Type de Texte</th>
+                <th>Titre</th>
+                <th>Date de Texte</th>
+                <th>Source</th>
+                <th>Secteurs</th>
+                <th>Suivi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reglementation in reglementations %}
+            <tr
+                onclick="window.location.href='{{ url_for('reglement.detail_reglementation', id=reglementation.id) }}'"
                 style="cursor: pointer;">
-                        <td>{{ loop.index }}</td>
-                        <td>{{ reglementation.sous_domaine.domaine.nom }}</td>
-                        <td>{{ reglementation.sous_domaine.nom if reglementation.sous_domaine else 'N/A' }}</td>
-                        <td>{{ reglementation.theme.nom if reglementation.theme else 'N/A' }}</td>
-                        <td>{{ reglementation.type_texte }}</td>
-                        <td>{{ reglementation.titre }}</td>
-                        <td>{{ reglementation.date_publication }}</td>
-                        <td>{{ reglementation.source }}</td>
-                        <td>{% for secteur in reglementation.secteurs  %}
+                <td>{{ loop.index }}</td>
+                <td>{{ reglementation.sous_domaine.domaine.nom }}</td>
+                <td>{{ reglementation.sous_domaine.nom if
+                    reglementation.sous_domaine else 'N/A' }}</td>
+                <td>{{ reglementation.theme.nom if reglementation.theme else
+                    'N/A' }}</td>
+                <td>{{ reglementation.type_texte }}</td>
+                <td>{{ reglementation.titre }}</td>
+                <td>{{ reglementation.date_publication }}</td>
+                <td>{{ reglementation.source }}</td>
+                <td>{% if reglementation.secteurs %}
+                    {% for secteur in reglementation.secteurs %}
+                    <p>{{ secteur.secteur.nom }}</p>
+                    {% endfor %}</td>
+                {% else %}
+                    <p class="text-center">***</p>
+                {% endif %}
+                <td>
+                    {% if reglementation.id in suivi_map %}
+                        {% if suivi_map[reglementation.id] %}
+                            <span class="badge bg-success">Suivi</span>
+                        {% else %}
+                            <span class="badge bg-danger">Non suivi</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-secondary">Inconnu</span>
+                    {% endif %}
+                </td>
+            </tr>
 
-                                <p>{{ secteur.secteur.nom }}</p>
-
-
-                        {% endfor %}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            {% endfor %}
+        </tbody>
+    </table>
     {% else %}
-        <p>Aucune réglementation n'a été trouvée.</p>
+    <p>Aucune réglementation n'a été trouvée.</p>
     {% endif %}
-
 
 </div>
 

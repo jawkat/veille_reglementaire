@@ -29,7 +29,7 @@ class ConformeEnum(Enum):
 #*************************************************************************************
 class User(db.Model, UserMixin):
     __tablename__ = 'utilisateur'
-    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid4()))
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
 
@@ -110,7 +110,8 @@ class Entreprise(db.Model):
                     # Ajouter la réglementation à l'entreprise
                     entreprise_reglementation = EntrepriseReglementation(
                         entreprise_id=self.id,
-                        reglementation_id=reglementation_id
+                        reglementation_id=reglementation_id,
+                        suivi = True
                     )
                     db.session.add(entreprise_reglementation)
 
