@@ -187,5 +187,44 @@
         });
     });
 </script>
+<script>
+
+    document.getElementById('add-theme-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+    
+        const nom = document.getElementById('themeNom').value;
+        const description = document.getElementById('themeDescription').value;
+    
+        fetch('/ajouter-theme', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ nom, description }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Thème ajouté avec succès');
+                    // Ajouter dynamiquement le thème dans la liste déroulante
+                    const themeSelect = document.getElementById('theme-select');
+                    const option = document.createElement('option');
+                    option.value = data.theme.id;
+                    option.textContent = data.theme.nom;
+                    themeSelect.appendChild(option);
+    
+                    // Fermer le modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addThemeModal'));
+                    modal.hide();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erreur lors de l’ajout du thème:', error);
+            });
+    });
+
+</script>
 
 {% endblock %}
