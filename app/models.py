@@ -89,11 +89,11 @@ class Entreprise(db.Model):
 
     date_creation = db.Column(db.Date, nullable=True)
 
-    utilisateurs = db.relationship('User', backref='entreprise', lazy=True)
-    reglementations = db.relationship('EntrepriseReglementation', backref='entreprise', lazy=True)
+    utilisateurs = db.relationship('User', backref='entreprise', lazy=True,  cascade="all, delete-orphan")
+    reglementations = db.relationship('EntrepriseReglementation', backref='entreprise', lazy=True,  cascade="all, delete-orphan")
     notifications = db.relationship('Notification', backref='entreprise', lazy=True)
     audits = db.relationship('Audit', backref='entreprise', lazy=True)
-    secteurs = db.relationship('Secteur', secondary='entreprise_secteur', back_populates='entreprises')
+    secteurs = db.relationship('Secteur', secondary='entreprise_secteur', back_populates='entreprises',  cascade="all")
 
     def assign_reglementations(self):
         """Attribuer automatiquement les réglementations liées aux secteurs de l'entreprise."""

@@ -17,3 +17,6 @@ flask db migrate -m "add score "
 flask db upgrade
 
 flask db migrate -m "tester uuid"
+
+
+flask db migrate -m "ajout suppression automatique des relation entreprises"

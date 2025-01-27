@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-2">
     <h1 class="mb-4 text-center">Ajouter une Réglementation</h1>
     <form method="POST">
         {{ form.hidden_tag() }}
@@ -26,7 +26,8 @@
             <div class="col-md-6">
                 <div class="form-group">
                     {{ form.sous_domaine_id.label(class="form-label") }}
-                    {{ form.sous_domaine_id(class="form-control", id="sous-secteur-select") }}
+                    {{ form.sous_domaine_id(class="form-control",
+                    id="sous-secteur-select") }}
                 </div>
             </div>
 
@@ -102,19 +103,32 @@
             </div>
 
             <!-- Secteurs -->
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label for="secteur-select">Secteurs</label>
-                    {{ form.secteurs(class="form-control", id="secteur-select")
-                    }}
-                    {% for error in form.secteurs.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                    {% endfor %}
+<div class="col-md-12">
+    <div class="form-group">
+        <label for="secteurs">Secteurs</label>
+        <div class="row">
+            {% for secteur in form.secteurs %}
+                <div class="col-md-3">  <!-- Trois colonnes -->
+                    <div class="form-check p-2">
+                        <input type="checkbox" class="form-check-input"
+                               id="secteur-{{ loop.index }}"
+                               value="{{ secteur.data }}" name="secteurs">
+                        <label class="form-check-label fw-bolder"
+                               for="secteur-{{ loop.index }}">{{ secteur.label.text }}</label>
+                    </div>
                 </div>
-            </div>
+            {% endfor %}
+        </div>
+        {% for error in form.secteurs.errors %}
+            <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+    </div>
+</div>
+
+
         </div>
 
-        <div class="text-center mt-4">
+        <div class="text-center my-4">
             <button type="submit" class="btn btn-primary">{{ form.submit.label
                 }}</button>
         </div>
@@ -190,40 +204,40 @@
 <script>
 
     document.getElementById('add-theme-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-    
-        const nom = document.getElementById('themeNom').value;
-        const description = document.getElementById('themeDescription').value;
-    
-        fetch('/ajouter-theme', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ nom, description }),
+    e.preventDefault();
+
+    const nom = document.getElementById('themeNom').value;
+    const description = document.getElementById('themeDescription').value;
+
+    fetch('/ajouter-theme', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nom, description }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Thème ajouté avec succès');
+                // Ajouter dynamiquement le thème dans la liste déroulante
+                const themeSelect = document.getElementById('theme-select');
+                const option = document.createElement('option');
+                option.value = data.theme.id;
+                option.textContent = data.theme.nom;
+                themeSelect.appendChild(option);
+
+                // Fermer le modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addThemeModal'));
+                modal.hide();
+            } else {
+                alert(data.message);
+            }
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Thème ajouté avec succès');
-                    // Ajouter dynamiquement le thème dans la liste déroulante
-                    const themeSelect = document.getElementById('theme-select');
-                    const option = document.createElement('option');
-                    option.value = data.theme.id;
-                    option.textContent = data.theme.nom;
-                    themeSelect.appendChild(option);
-    
-                    // Fermer le modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('addThemeModal'));
-                    modal.hide();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors de l’ajout du thème:', error);
-            });
-    });
+        .catch(error => {
+            console.error('Erreur lors de l’ajout du thème:', error);
+        });
+});
 
 </script>
 

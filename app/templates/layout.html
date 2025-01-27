@@ -49,7 +49,7 @@
 
               <li class="nav-item">
                 <a class="nav-link text-white"
-                  href="{{ url_for('reglement.afficher_entreprise', entreprise_id=current_user.entreprise_id) }}">
+                  href="{{ url_for('entreprise.afficher_entreprise', entreprise_id=current_user.entreprise_id) }}">
                   Veille
                 </a>
               </li>
@@ -73,10 +73,10 @@
                 <ul class="dropdown-menu">
 
                   <li><a class="dropdown-item"
-                      href="{{ url_for('reglement.ajouter_entreprise_et_manager') }}">Ajout
+                      href="{{ url_for('entreprise.ajouter_entreprise_et_manager') }}">Ajout
                       Entreprise</a></li>
                   <li><a class="dropdown-item"
-                      href="{{ url_for('reglement.liste_entreprises') }}">Liste
+                      href="{{ url_for('entreprise.liste_entreprises') }}">Liste
                       E/S</a></li>
                   <li><a class="dropdown-item"
                       href="{{ url_for('reglement.liste_secteurs') }}">Secteurs</a></li>
