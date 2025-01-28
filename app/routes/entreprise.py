@@ -151,36 +151,39 @@ def afficher_entreprise_pour_utilisateur():
 
 
 
-@bp.route('/ajouter-suivi', methods=['POST'])
-@role_required(['ADMIN'])
-def ajouter_suivi():
-    try:
-        data = request.get_json()
-        entreprise_id = data.get('entreprise_id')
-        reglementation_id = data.get('reglementation_id')
+@bp.route('/toggle-suivi', methods=['POST'])
+@login_required
+def toggle_suivi():
+    data = request.get_json()
+    reglementation_id = data.get('reglementation_id')
+    action = data.get('action')
 
-        if not entreprise_id or not reglementation_id:
-            return jsonify({"success": False, "error": "Données invalides."}), 400
+    if not reglementation_id or not action:
+        return jsonify({'message': 'Données manquantes'}), 400
 
-        # Vérifiez si la relation existe déjà
-        relation = EntrepriseReglementation.query.filter_by(
-            entreprise_id=entreprise_id,
-            reglementation_id=reglementation_id
-        ).first()
+    entreprise_id = current_user.entreprise_id  # Récupère l'entreprise associée à l'utilisateur
 
+    # Recherche ou création de la relation
+    relation = EntrepriseReglementation.query.filter_by(
+        entreprise_id=entreprise_id,
+        reglementation_id=reglementation_id
+    ).first()
+
+    if action == "suivre":
+        if not relation:
+            relation = EntrepriseReglementation(
+                entreprise_id=entreprise_id,
+                reglementation_id=reglementation_id,
+                suivi=True
+            )
+            db.session.add(relation)
+        else:
+            relation.suivi = True
+
+    elif action == "dissocier":
         if relation:
-            return jsonify({"success": False, "error": "Relation déjà existante."}), 400
+            relation.suivi = False
 
-        # Créez une nouvelle relation avec suivi=True
-        entreprise_reglementation = EntrepriseReglementation(
-            entreprise_id=entreprise_id,
-            reglementation_id=reglementation_id,
-            suivi=True
-        )
-        db.session.add(entreprise_reglementation)
-        db.session.commit()
+    db.session.commit()
 
-        return jsonify({"success": True}), 200
-
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    return jsonify({'suivi': relation.suivi if relation else False})

@@ -55,8 +55,26 @@
                 </div>
             </div>
 
-            <hr>
+                        <!-- Bouton pour Suivre ou Dissocier -->
+                <button id="toggle-suivi-btn" 
+                        class="btn float-end  {% if reglementation.id in suivi_map and suivi_map[reglementation.id] %}btn-danger{% else %}btn-success{% endif %}"
+                        style="width: 150px"
+                        data-reglementation-id="{{ reglementation.id }}"
+                        data-action="{% if reglementation.id in suivi_map and suivi_map[reglementation.id] %}dissocier{% else %}suivre{% endif %}">
+                    {% if reglementation.id in suivi_map and suivi_map[reglementation.id] %}
+                        Dissocier
+                    {% else %}
+                        Suivre
+                    {% endif %}
+                </button>
 
+            <hr class="mt-5">
+            {% if current_user.is_authenticated and current_user.role.name == 'ADMIN' %}
+            <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
+                class="btn btn-success float-end">
+                Ajouter un Article
+            </a>
+        {% endif %}
             <!-- Affichage des articles -->
             <h5>Articles :</h5>
             {% if reglementation.articles %}
@@ -121,17 +139,7 @@
             {% endif %}
         </div>
         <div class="card-footer d-flex justify-content-between">
-            {% if current_user.is_authenticated and current_user.role.name == 'ADMIN' %}
-            <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
-                class="btn btn-success">
-                Ajouter un Article
-            </a>
-            <button id="ajouter-suivi" class="btn btn-primary" 
-            data-reglementation-id="{{ reglementation.id }}" 
-            data-entreprise-id="{{ current_user.entreprise_id }}">
-            Ajouter au suivi
-        </button>
-        {% endif %}
+
         
             <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary">
                 Retour à la liste
@@ -139,33 +147,54 @@
         </div>
     </div>
 </div>
-<script>
-    document.getElementById('ajouter-suivi').addEventListener('click', function() {
-        const reglementationId = this.getAttribute('data-reglementation-id');
-        const entrepriseId = this.getAttribute('data-entreprise-id');
 
-        fetch("{{ url_for('entreprise.ajouter_suivi') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                entreprise_id: entrepriseId,
-                reglementation_id: reglementationId
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Met à jour l'affichage du badge
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleSuiviBtn = document.getElementById('toggle-suivi-btn');
+        
+        toggleSuiviBtn.addEventListener('click', async () => {
+            const reglementationId = toggleSuiviBtn.dataset.reglementationId;
+            const action = toggleSuiviBtn.dataset.action;
+
+            try {
+                const response = await fetch(`/toggle-suivi`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        reglementation_id: reglementationId,
+                        action: action
+                    })
+                });
+
+                const data = await response.json();
                 const badge = document.querySelector('.badge');
-                badge.textContent = "Suivi";
-                badge.className = "badge bg-success";
-            } else {
-                alert("Erreur : " + data.error);
+                if (response.ok) {
+                    // Met à jour l'état du bouton
+                    if (data.suivi) {
+                        toggleSuiviBtn.textContent = "Dissocier";
+                        toggleSuiviBtn.classList.replace('btn-success', 'btn-danger');
+                        toggleSuiviBtn.dataset.action = "dissocier";
+
+                        badge.textContent = "Suivi";
+                        badge.className = "badge bg-success";
+                        
+                    } else {
+                        toggleSuiviBtn.textContent = "Suivre";
+                        toggleSuiviBtn.classList.replace('btn-danger', 'btn-success');
+                        toggleSuiviBtn.dataset.action = "suivre";
+                        badge.textContent = "Non suivi";
+                        badge.className = "badge bg-danger";
+
+                    }
+                } else {
+                    console.error('Erreur :', data.message);
+                }
+            } catch (error) {
+                console.error('Erreur réseau :', error);
             }
-        })
-        .catch(error => console.error("Erreur :", error));
+        });
     });
 </script>
 {% endblock %}
