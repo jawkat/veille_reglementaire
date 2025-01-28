@@ -71,7 +71,7 @@
             <hr class="mt-5">
             {% if current_user.is_authenticated and current_user.role.name == 'ADMIN' %}
             <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
-                class="btn btn-success float-end">
+                class="btn btn-success float-end sticky-md-top">
                 Ajouter un Article
             </a>
         {% endif %}
@@ -83,6 +83,7 @@
                     <tr>
                         <th>Numéro</th>
                         <th>Contenu</th>
+                        <th>action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -100,6 +101,17 @@
                             {% for ligne in article.contenu.split('\n') %}
                             <p>{{ ligne }}</p>
                             {% endfor %}
+                        </td>
+                        <td>
+                        <a href="{{ url_for('article.modifier_article', article_id=article.id) }}"
+                            class="btn btn-warning">
+                            Modifier
+                        </a>
+                            <form method="POST" action="{{ url_for('article.supprimer_article', article_id=article.id) }}" style="display: inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                    Supprimer
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}
@@ -181,7 +193,7 @@
                         badge.className = "badge bg-success";
                         
                     } else {
-                        toggleSuiviBtn.textContent = "Suivre";
+                        toggleSuiviBtn.textContent = "Suivre"
                         toggleSuiviBtn.classList.replace('btn-danger', 'btn-success');
                         toggleSuiviBtn.dataset.action = "suivre";
                         badge.textContent = "Non suivi";

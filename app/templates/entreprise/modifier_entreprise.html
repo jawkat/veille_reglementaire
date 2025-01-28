@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-3">Modifier l'Entreprise : {{ entreprise.nom }}</h1>
+
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            <label for="nom">Nom de l'Entreprise</label>
+            {{ form.nom(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            {{ form.description(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="pays">Pays</label>
+            {{ form.pays(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            <label for="secteurs">Secteurs</label>
+            {{ form.secteurs(class="form-select") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Modifier</button>
+        <a href="{{ url_for('entreprise.afficher_entreprise', entreprise_id=entreprise.id) }}" class="btn btn-secondary mt-3">Annuler</a>
+    </form>
+</div>
+{% endblock %}

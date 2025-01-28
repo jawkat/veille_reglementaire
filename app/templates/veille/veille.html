@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2 class="mt-2">Réglementations associées</h2>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Article</th>
+                <th>type</th>
+                <th>suivi</th>
+                <th>Score</th>
+                <th>consulter</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entreprise_reglementation in entreprise.reglementations %}
+            {% if entreprise_reglementation.suivi %}
+                
+
+
+            <tr>
+                <td>{{ entreprise_reglementation.reglementation.titre }}</td>
+                <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
+                <td>{{ "OUI" if entreprise_reglementation.suivi  else "Non" }}</td>
+                <td>{{ entreprise_reglementation.score }}</td>
+
+                <td>
+                    <a href="{{ url_for('evaluation.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"
+                        class="btn btn-primary btn-sm">Voir</a>
+                </td>
+
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

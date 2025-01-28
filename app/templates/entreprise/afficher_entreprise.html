@@ -1,67 +1,35 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-3">{{ entreprise.nom }}</h1>
-    <p><strong>Description :</strong> {{ entreprise.description }}</p>
-    <p><strong>Pays :</strong> {{ entreprise.pays }}</p>
-    <p><strong>Date d'ajout :</strong>
-        {{ entreprise.date_creation.strftime('%d/%m/%Y') if entreprise.date_creation else '--' }}
-    </p>
-
-    <h2 class="mt-4">Utilisateurs associés</h2>
-    {% if utilisateurs %}
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in utilisateurs %}
-            <tr>
-                <td>{{ user.name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.role.value}}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>Aucun utilisateur n'est associé à cette entreprise.</p>
-    {% endif %}
-
-
-    <h2 class="mt-4">Réglementations associées</h2>
-    <table class="table table-bordered mt-3">
-        <thead>
-            <tr>
-                <th>Article</th>
-                <th>type</th>
-                <th>suivi</th>
-                <th>Score</th>
-                <th>consulter</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for entreprise_reglementation in entreprise.reglementations %}
-            <tr>
-                <td>{{ entreprise_reglementation.reglementation.titre }}</td>
-                <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
-                <td>{{ entreprise_reglementation.suivi }}</td>
-                <td>{{ entreprise_reglementation.score }}</td>
-
-                <td>
-                    <a href="{{ url_for('evaluation.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"
-                        class="btn btn-primary btn-sm">Voir</a>
-                </td>
-
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+<div class="container my-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">{{ entreprise.nom }}</h2>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><strong>Description :</strong> {{ entreprise.description or "Non spécifiée" }}</p>
+            <p class="card-text"><strong>Pays :</strong> {{ entreprise.pays or "Non spécifié" }}</p>
+            <p class="card-text"><strong>Date d'ajout :</strong> 
+                {{ entreprise.date_creation.strftime('%d/%m/%Y') if entreprise.date_creation else '--' }}
+            </p>
+            
+            {% if entreprise.secteurs %}
+            <div>
+                <strong>Secteurs associés :</strong>
+                {% for secteur in entreprise.secteurs %}
+                <span class="badge bg-secondary">{{ secteur.nom }}</span>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-muted">Aucun secteur associé.</p>
+            {% endif %}
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+            <a href="{{ url_for('entreprise.modifier_entreprise', entreprise_id=entreprise.id) }}" class="btn btn-warning">Modifier</a>
+            <form action="{{ url_for('entreprise.supprimer_entreprise', entreprise_id=entreprise.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette entreprise ?');">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

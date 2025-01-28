@@ -42,6 +42,7 @@ def create_app(config_class='config.Config'):
     from .routes.manager import bp as manager_bp
     from .routes.evaluation import bp as evaluation_bp
     from .routes.entreprise import bp as entreprise_bp
+    from .routes.article import bp as article_bp
 
 
 
@@ -52,6 +53,7 @@ def create_app(config_class='config.Config'):
     app.register_blueprint(manager_bp)
     app.register_blueprint(evaluation_bp)
     app.register_blueprint(entreprise_bp)
+    app.register_blueprint(article_bp)
 
 
     return app

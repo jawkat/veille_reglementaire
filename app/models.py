@@ -169,12 +169,12 @@ class Reglementation(db.Model):
     source = db.Column(db.String(200), nullable=False)
     langue = db.Column(db.String(50), nullable=True)
 
-    secteurs=db.relationship('ReglementationSecteur', back_populates='reglementation', lazy=True)
+    secteurs=db.relationship('ReglementationSecteur', back_populates='reglementation', lazy=True, cascade='all, delete-orphan')
 
     theme_id = db.Column(db.Integer, db.ForeignKey('theme.id'), nullable=False)
     sous_domaine_id = db.Column(db.Integer, db.ForeignKey('sous_domaine.id'), nullable=False)
-    versions = db.relationship('VersionReglementation', backref='reglementation', lazy=True)
-    articles = db.relationship('Article', backref='reglementation', lazy=True)
+    versions = db.relationship('VersionReglementation', backref='reglementation', lazy=True, cascade='all, delete-orphan')
+    articles = db.relationship('Article', backref='reglementation', lazy=True, cascade='all, delete-orphan')
 
 class EntrepriseReglementation(db.Model):
     __tablename__ = 'entreprise_reglementation'

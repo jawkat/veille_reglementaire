@@ -20,7 +20,7 @@ class EntrepriseForm(FlaskForm):
     nom = StringField('Nom de l\'entreprise', validators=[DataRequired()])
     description = TextAreaField('Description de l\'entreprise')
     pays = StringField('Pays', validators=[DataRequired()])
-    date_creation = DateField('Date de Creation', format='%Y-%m-%d', validators=[DataRequired()], default=date.today)
+    date_creation = DateField('Date de Creation', format='%Y-%m-%d', default=date.today)
     secteurs = SelectMultipleField('Secteurs', coerce=int, choices=[])  # champ de sélection multiple
 
     def __init__(self, *args, **kwargs):
@@ -32,7 +32,7 @@ class EntrepriseForm(FlaskForm):
 class UserForm(FlaskForm):
     name = StringField('Nom de l\'utilisateur', validators=[DataRequired()])
     email = EmailField('Email', validators=[DataRequired(), Email()])
-    role = SelectField('Rôle', choices=[
+    role = SelectField('Rôle', choices=[('MANAGER','Manager'),
             ('RESPONSABLE','Responsable Veille'),
             ('COLLABORATEUR','Collaborateur')], validators=[DataRequired()])
     password = StringField('Mot de passe', validators=[DataRequired()])
@@ -77,35 +77,37 @@ def ajouter_entreprise_et_manager():
             # Appeler la méthode pour attribuer les réglementations liées aux secteurs
             entreprise.assign_reglementations()
 
+                   # Vérifier si un utilisateur avec cet email existe déjà
+            existant_user = User.query.filter_by(email=user_form.email.data).first()
+
+            if existant_user:
+                flash("Un utilisateur avec cet email existe déjà. Veuillez en choisir un autre.", "danger")
+                return render_template(
+                    'entreprise/ajouter_entreprise_et_manager.html',
+                    entreprise_form=entreprise_form,
+                    user_form=user_form
+                )
+
+            # Créer l'utilisateur avec le rôle approprié
+            manager_user = User(
+                name=user_form.name.data,
+                email=user_form.email.data,
+                role=user_form.role.data,
+                entreprise_id=entreprise.id
+            )
+            manager_user.set_password(user_form.password.data)
+            db.session.add(manager_user)
 
             db.session.commit()
 
             flash('Entreprise ajoutée avec succès.', 'success')
         else:
-            flash('L\'entreprise existe déjà.', 'warning')
-
-        # Vérifier si un utilisateur avec cet email existe déjà
-        existant_user = User.query.filter_by(email=user_form.email.data).first()
-
-        if existant_user:
-            flash("Un utilisateur avec cet email existe déjà. Veuillez en choisir un autre.", "danger")
+            flash("Un entreprise ou utilisateur existe déjà. Veuillez en choisir un autre.", "danger")
             return render_template(
                 'entreprise/ajouter_entreprise_et_manager.html',
                 entreprise_form=entreprise_form,
                 user_form=user_form
             )
-
-        # Créer l'utilisateur avec le rôle approprié
-        manager_user = User(
-            name=user_form.name.data,
-            email=user_form.email.data,
-            role=user_form.role.data,
-            entreprise_id=entreprise.id
-        )
-        manager_user.set_password(user_form.password.data)
-        db.session.add(manager_user)
-        db.session.commit()
-        flash('l\'Utilisateur ajouté avec succès.', 'success')
 
         return redirect(url_for('entreprise.liste_entreprises'))
 
@@ -128,6 +130,19 @@ def afficher_entreprise(entreprise_id):
         entreprise=entreprise,
         utilisateurs=utilisateurs
     )
+
+@bp.route('/veille/<int:entreprise_id>', methods=['GET'])
+@login_required
+def afficher_veille(entreprise_id):
+    # Récupérer l'entreprise avec ses utilisateurs
+    entreprise = Entreprise.query.filter_by(id=entreprise_id).first_or_404()
+
+
+    return render_template(
+        'veille/veille.html',
+        entreprise=entreprise,
+    )
+
 
 
 @bp.route('/entreprises', methods=['GET'])
@@ -162,6 +177,7 @@ def toggle_suivi():
         return jsonify({'message': 'Données manquantes'}), 400
 
     entreprise_id = current_user.entreprise_id  # Récupère l'entreprise associée à l'utilisateur
+    reglementation = Reglementation.query.get(reglementation_id)
 
     # Recherche ou création de la relation
     relation = EntrepriseReglementation.query.filter_by(
@@ -180,10 +196,92 @@ def toggle_suivi():
         else:
             relation.suivi = True
 
+        if reglementation:
+            for article in reglementation.articles:
+                evaluation_existante = Evaluation.query.filter_by(
+                    entreprise_id=entreprise_id,
+                    article_id=article.id
+                ).first()
+                if not evaluation_existante:
+                    evaluation = Evaluation(
+                        entreprise_id=entreprise_id,
+                        article_id=article.id,
+                        applicable=ApplicableEnum.NON_EVALUE,
+                        conforme=ConformeEnum.NON_EVALUE
+                    )
+                    db.session.add(evaluation)
+        db.session.commit()
+
+
     elif action == "dissocier":
         if relation:
             relation.suivi = False
-
-    db.session.commit()
+        if reglementation:
+            for article in reglementation.articles:
+                Evaluation.query.filter_by(
+                    entreprise_id=entreprise_id,
+                    article_id=article.id
+                ).delete()
+            
+        db.session.commit()
 
     return jsonify({'suivi': relation.suivi if relation else False})
+
+
+
+@bp.route('/modifier_entreprise/<int:entreprise_id>', methods=['GET', 'POST'])
+@role_required(['ADMIN'])
+def modifier_entreprise(entreprise_id):
+    # Récupérer l'entreprise à modifier
+    entreprise = Entreprise.query.get_or_404(entreprise_id)
+    form = EntrepriseForm(obj=entreprise)
+
+    # Charger les choix des secteurs
+    secteurs = Secteur.query.all()
+    form.secteurs.choices = [(secteur.id, secteur.nom) for secteur in secteurs]
+
+    if form.validate_on_submit():
+        try:
+            # Mettre à jour les informations principales
+            entreprise.nom = form.nom.data
+            entreprise.description = form.description.data
+            entreprise.pays = form.pays.data
+  
+
+            # Mettre à jour les secteurs associés
+            EntrepriseSecteur.query.filter_by(entreprise_id=entreprise.id).delete()
+            for secteur_id in form.secteurs.data:
+                db.session.add(EntrepriseSecteur(entreprise_id=entreprise.id, secteur_id=secteur_id))
+
+            # Enregistrer les modifications
+            db.session.commit()
+            flash('Entreprise modifiée avec succès.', 'success')
+            return redirect(url_for('entreprise.afficher_entreprise', entreprise_id=entreprise.id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Erreur lors de la modification : {e}")
+            flash('Erreur lors de la modification de l\'entreprise.', 'danger')
+
+    # Afficher les erreurs si le formulaire n'est pas validé
+    if form.errors:
+        flash(f"Erreurs de validation : {form.errors}")
+
+    return render_template('entreprise/modifier_entreprise.html', form=form, entreprise=entreprise)
+
+
+
+@bp.route('/supprimer_entreprise/<int:entreprise_id>', methods=['POST'])
+@role_required(['ADMIN'])
+def supprimer_entreprise(entreprise_id):
+    # Récupérer l'entreprise
+    entreprise = Entreprise.query.get_or_404(entreprise_id)
+
+    # Supprimer les secteurs associés
+    EntrepriseSecteur.query.filter_by(entreprise_id=entreprise.id).delete()
+
+    # Supprimer l'entreprise
+    db.session.delete(entreprise)
+    db.session.commit()
+
+    flash('Entreprise supprimée avec succès.', 'success')
+    return redirect(url_for('entreprise.liste_entreprises'))

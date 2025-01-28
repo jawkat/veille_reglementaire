@@ -24,6 +24,7 @@
                 <th>Source</th>
                 <th>Secteurs</th>
                 <th>Suivi</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -58,6 +59,16 @@
                     {% else %}
                         <span class="badge bg-secondary">Inconnu</span>
                     {% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('reglement.modifier_reglementation', reglementation_id=reglementation.id) }}" class="btn btn-primary btn-sm">
+                        Modifier
+                    </a>
+                    <form action="{{ url_for('reglement.supprimer_reglementation', reglementation_id=reglementation.id) }}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment supprimer cette réglementation ?')">
+                            Supprimer
+                        </button>
+                    </form>
                 </td>
             </tr>
 
