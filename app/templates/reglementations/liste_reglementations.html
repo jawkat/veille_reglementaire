@@ -43,7 +43,7 @@
                 <td>{{ reglementation.source }}</td>
                 <td>{% if reglementation.secteurs %}
                     {% for secteur in reglementation.secteurs %}
-                    <p>{{ secteur.secteur.nom }}</p>
+                    <div>{{ secteur.secteur.nom }} </div>
                     {% endfor %}</td>
                 {% else %}
                     <p class="text-center">***</p>

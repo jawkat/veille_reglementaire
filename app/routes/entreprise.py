@@ -76,6 +76,8 @@ def ajouter_entreprise_et_manager():
 
             # Appeler la méthode pour attribuer les réglementations liées aux secteurs
             entreprise.assign_reglementations()
+
+
             db.session.commit()
 
             flash('Entreprise ajoutée avec succès.', 'success')
@@ -146,3 +148,39 @@ def afficher_entreprise_pour_utilisateur():
     else:
         flash('Aucune entreprise associée à votre compte.', 'danger')
         return redirect(url_for('main.index'))  # Ou vers une autre page d'accueil
+
+
+
+@bp.route('/ajouter-suivi', methods=['POST'])
+@role_required(['ADMIN'])
+def ajouter_suivi():
+    try:
+        data = request.get_json()
+        entreprise_id = data.get('entreprise_id')
+        reglementation_id = data.get('reglementation_id')
+
+        if not entreprise_id or not reglementation_id:
+            return jsonify({"success": False, "error": "Données invalides."}), 400
+
+        # Vérifiez si la relation existe déjà
+        relation = EntrepriseReglementation.query.filter_by(
+            entreprise_id=entreprise_id,
+            reglementation_id=reglementation_id
+        ).first()
+
+        if relation:
+            return jsonify({"success": False, "error": "Relation déjà existante."}), 400
+
+        # Créez une nouvelle relation avec suivi=True
+        entreprise_reglementation = EntrepriseReglementation(
+            entreprise_id=entreprise_id,
+            reglementation_id=reglementation_id,
+            suivi=True
+        )
+        db.session.add(entreprise_reglementation)
+        db.session.commit()
+
+        return jsonify({"success": True}), 200
+
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500

@@ -126,6 +126,11 @@
                 class="btn btn-success">
                 Ajouter un Article
             </a>
+            <button id="ajouter-suivi" class="btn btn-primary" 
+            data-reglementation-id="{{ reglementation.id }}" 
+            data-entreprise-id="{{ current_user.entreprise_id }}">
+            Ajouter au suivi
+        </button>
         {% endif %}
         
             <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary">
@@ -134,4 +139,33 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('ajouter-suivi').addEventListener('click', function() {
+        const reglementationId = this.getAttribute('data-reglementation-id');
+        const entrepriseId = this.getAttribute('data-entreprise-id');
+
+        fetch("{{ url_for('entreprise.ajouter_suivi') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                entreprise_id: entrepriseId,
+                reglementation_id: reglementationId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Met à jour l'affichage du badge
+                const badge = document.querySelector('.badge');
+                badge.textContent = "Suivi";
+                badge.className = "badge bg-success";
+            } else {
+                alert("Erreur : " + data.error);
+            }
+        })
+        .catch(error => console.error("Erreur :", error));
+    });
+</script>
 {% endblock %}
