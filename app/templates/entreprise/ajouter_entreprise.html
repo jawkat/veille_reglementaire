@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary mb-4">Ajouter une entreprise</h2>
+
+    <form method="POST">
+        {{ entreprise_form.hidden_tag() }}
+
+        <div class="form-floating mb-3">
+            {{ entreprise_form.nom(class="form-control", id="nom") }}
+            <label for="nom">Nom de l'entreprise</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ entreprise_form.description(class="form-control", id="description") }}
+            <label for="description">Description</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ entreprise_form.pays(class="form-control", id="pays") }}
+            <label for="pays">Pays</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ entreprise_form.secteurs(class="form-control", id="secteur-select", style="height: 100%; max-height: 500px;") }}
+            <label for="secteur-select">Secteurs</label>
+            {% for error in entreprise_form.secteurs.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">Créer l'entreprise</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

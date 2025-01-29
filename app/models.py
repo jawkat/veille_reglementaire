@@ -93,12 +93,14 @@ class Entreprise(db.Model):
     reglementations = db.relationship('EntrepriseReglementation', backref='entreprise', lazy=True,  cascade="all, delete-orphan")
     notifications = db.relationship('Notification', backref='entreprise', lazy=True)
     audits = db.relationship('Audit', backref='entreprise', lazy=True)
-    secteurs = db.relationship('Secteur', secondary='entreprise_secteur', back_populates='entreprises',  cascade="all")
+    secteurs = db.relationship('Secteur', secondary='entreprise_secteur', back_populates='entreprises')
 
     def assign_reglementations(self):
         """Attribuer automatiquement les réglementations liées aux secteurs de l'entreprise."""
         # Créez un ensemble des réglementations déjà associées
         reglementations_existantes = {r.reglementation_id for r in self.reglementations}
+        nouvelles_reglementations = []
+        nouvelles_evaluations = []
 
         # Ajoutez uniquement les réglementations non associées
 
@@ -108,14 +110,13 @@ class Entreprise(db.Model):
                 reglementation_id = reglementation_secteur.reglementation_id
                 if reglementation_id not in reglementations_existantes:
                     # Ajouter la réglementation à l'entreprise
-                    entreprise_reglementation = EntrepriseReglementation(
+                    nouvelles_reglementations.append(EntrepriseReglementation(
                         entreprise_id=self.id,
                         reglementation_id=reglementation_id,
                         suivi = True
-                    )
-                    db.session.add(entreprise_reglementation)
+                    ))
 
-                    # Créer les évaluations par défaut pour les articles de cette réglementation
+                    # # Ajouter les évaluations pour les articles de cette réglementation
                     reglementation = Reglementation.query.get(reglementation_id)
                     if reglementation:
                         for article in reglementation.articles:
@@ -124,14 +125,22 @@ class Entreprise(db.Model):
                                 article_id=article.id
                             ).first()
                             if not evaluation_existante:
-                                evaluation = Evaluation(
+                                nouvelles_evaluations.append(Evaluation(
                                     entreprise_id=self.id,
                                     article_id=article.id,
                                     applicable=ApplicableEnum.NON_EVALUE,
                                     conforme=ConformeEnum.NON_EVALUE
-                                )
-                                db.session.add(evaluation)
-
+                                ))
+                                
+        # Ajouter en une seule transaction
+        try:
+            db.session.bulk_save_objects(nouvelles_reglementations)
+            db.session.bulk_save_objects(nouvelles_evaluations)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            print(f"Erreur lors de l'ajout des réglementations : {e}")
+            
 
 class ReglementationSecteur(db.Model):
     __tablename__ = 'reglementation_secteur'

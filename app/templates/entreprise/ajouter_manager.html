@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-primary mb-4">Ajouter un utilisateur (Manager) pour {{ entreprise.nom }}</h2>
+
+    <form method="POST">
+        {{ user_form.hidden_tag() }}
+
+        <div class="form-floating mb-3">
+            {{ user_form.name(class="form-control", id="name") }}
+            <label for="name">Nom de l'utilisateur</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ user_form.email(class="form-control", id="email") }}
+            <label for="email">Email</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ user_form.role(class="form-control", id="role") }}
+            <label for="role">Rôle</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            {{ user_form.password(class="form-control", id="password") }}
+            <label for="password">Mot de passe</label>
+        </div>
+
+        <!-- Bouton de soumission -->
+        <div class="d-grid">
+            <button type="submit" class="btn btn-success btn-lg">Créer le manager</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

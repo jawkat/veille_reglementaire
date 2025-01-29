@@ -39,83 +39,165 @@ class UserForm(FlaskForm):
 
 
 
-@bp.route('/ajouter_entreprise_et_manager', methods=['GET', 'POST'])
-@role_required(['ADMIN'])
-def ajouter_entreprise_et_manager():
-    entreprise_form = EntrepriseForm()
-    user_form = UserForm()
-    secteurs = Secteur.query.all()  # Récupérer tous les secteurs
+# @bp.route('/ajouter_entreprise_et_manager', methods=['GET', 'POST'])
+# @role_required(['ADMIN'])
+# def ajouter_entreprise_et_manager():
+#     entreprise_form = EntrepriseForm()
+#     user_form = UserForm()
+#     secteurs = Secteur.query.all()  # Récupérer tous les secteurs
 
-    # Initialiser les choix pour le champ secteurs
+#     # Initialiser les choix pour le champ secteurs
+#     entreprise_form.secteurs.choices = [(secteur.id, secteur.nom) for secteur in secteurs]
+
+#     if entreprise_form.validate_on_submit() and user_form.validate_on_submit():
+#         # Vérifier si l'entreprise existe déjà
+#         entreprise = Entreprise.query.filter_by(nom=entreprise_form.nom.data).first()
+
+#         if not entreprise:
+#             # Créer l'entreprise
+#             entreprise = Entreprise(
+#                 nom=entreprise_form.nom.data,
+#                 description=entreprise_form.description.data,
+#                 pays=entreprise_form.pays.data,
+#                 date_creation= date.today()
+#             )
+#             db.session.add(entreprise)
+#             db.session.commit()
+
+#             # Associer les secteurs sélectionnés à l'entreprise
+#             secteurs_selectionnes = entreprise_form.secteurs.data
+#             for secteur_id in secteurs_selectionnes:
+#                 entreprise_secteur = EntrepriseSecteur(
+#                     entreprise_id=entreprise.id,
+#                     secteur_id=secteur_id
+#                 )
+#                 db.session.add(entreprise_secteur)
+#             db.session.commit()
+
+#             # Appeler la méthode pour attribuer les réglementations liées aux secteurs
+#             entreprise.assign_reglementations()
+
+#                    # Vérifier si un utilisateur avec cet email existe déjà
+#             existant_user = User.query.filter_by(email=user_form.email.data).first()
+
+#             if existant_user:
+#                 flash("Un utilisateur avec cet email existe déjà. Veuillez en choisir un autre.", "danger")
+#                 return render_template(
+#                     'entreprise/ajouter_entreprise_et_manager.html',
+#                     entreprise_form=entreprise_form,
+#                     user_form=user_form
+#                 )
+
+#             # Créer l'utilisateur avec le rôle approprié
+#             manager_user = User(
+#                 name=user_form.name.data,
+#                 email=user_form.email.data,
+#                 role=user_form.role.data,
+#                 entreprise_id=entreprise.id
+#             )
+#             manager_user.set_password(user_form.password.data)
+#             db.session.add(manager_user)
+
+#             db.session.commit()
+
+#             flash('Entreprise ajoutée avec succès.', 'success')
+#         else:
+#             flash("Un entreprise ou utilisateur existe déjà. Veuillez en choisir un autre.", "danger")
+#             return render_template(
+#                 'entreprise/ajouter_entreprise_et_manager.html',
+#                 entreprise_form=entreprise_form,
+#                 user_form=user_form
+#             )
+
+#         return redirect(url_for('entreprise.liste_entreprises'))
+
+#     return render_template(
+#         'entreprise/ajouter_entreprise_et_manager.html',
+#         entreprise_form=entreprise_form,
+#         user_form=user_form
+#     )
+
+
+
+
+@bp.route('/ajouter_entreprise', methods=['GET', 'POST'])
+@role_required(['ADMIN'])
+def ajouter_entreprise():
+    entreprise_form = EntrepriseForm()
+    secteurs = Secteur.query.all()
     entreprise_form.secteurs.choices = [(secteur.id, secteur.nom) for secteur in secteurs]
 
-    if entreprise_form.validate_on_submit() and user_form.validate_on_submit():
-        # Vérifier si l'entreprise existe déjà
-        entreprise = Entreprise.query.filter_by(nom=entreprise_form.nom.data).first()
+    if entreprise_form.validate_on_submit():
+        entreprise_existante = Entreprise.query.filter_by(nom=entreprise_form.nom.data).first()
+        if entreprise_existante:
+            flash("Une entreprise avec ce nom existe déjà.", "danger")
+            return redirect(url_for('entreprise.ajouter_entreprise'))
 
-        if not entreprise:
-            # Créer l'entreprise
-            entreprise = Entreprise(
-                nom=entreprise_form.nom.data,
-                description=entreprise_form.description.data,
-                pays=entreprise_form.pays.data,
-                date_creation= date.today()
+        # Créer l'entreprise
+        entreprise = Entreprise(
+            nom=entreprise_form.nom.data,
+            description=entreprise_form.description.data,
+            pays=entreprise_form.pays.data,
+            date_creation=date.today()
+        )
+        db.session.add(entreprise)
+        db.session.commit()
+
+        # Associer les secteurs sélectionnés
+        for secteur_id in entreprise_form.secteurs.data:
+            entreprise_secteur = EntrepriseSecteur(
+                entreprise_id=entreprise.id,
+                secteur_id=secteur_id
             )
-            db.session.add(entreprise)
-            db.session.commit()
+            db.session.add(entreprise_secteur)
+        db.session.commit()
 
-            # Associer les secteurs sélectionnés à l'entreprise
-            secteurs_selectionnes = entreprise_form.secteurs.data
-            for secteur_id in secteurs_selectionnes:
-                entreprise_secteur = EntrepriseSecteur(
-                    entreprise_id=entreprise.id,
-                    secteur_id=secteur_id
-                )
-                db.session.add(entreprise_secteur)
-            db.session.commit()
+        # Assigner les réglementations
+        entreprise.assign_reglementations()
 
-            # Appeler la méthode pour attribuer les réglementations liées aux secteurs
-            entreprise.assign_reglementations()
+        flash("Entreprise créée avec succès. Ajoutez maintenant un manager.", "success")
+        return redirect(url_for('entreprise.ajouter_manager', entreprise_id=entreprise.id))
 
-                   # Vérifier si un utilisateur avec cet email existe déjà
-            existant_user = User.query.filter_by(email=user_form.email.data).first()
+    return render_template(
+        'entreprise/ajouter_entreprise.html',
+        entreprise_form=entreprise_form
+    )
 
-            if existant_user:
-                flash("Un utilisateur avec cet email existe déjà. Veuillez en choisir un autre.", "danger")
-                return render_template(
-                    'entreprise/ajouter_entreprise_et_manager.html',
-                    entreprise_form=entreprise_form,
-                    user_form=user_form
-                )
 
-            # Créer l'utilisateur avec le rôle approprié
-            manager_user = User(
-                name=user_form.name.data,
-                email=user_form.email.data,
-                role=user_form.role.data,
-                entreprise_id=entreprise.id
-            )
-            manager_user.set_password(user_form.password.data)
-            db.session.add(manager_user)
+@bp.route('/ajouter_manager/<int:entreprise_id>', methods=['GET', 'POST'])
+@role_required(['ADMIN'])
+def ajouter_manager(entreprise_id):
+    entreprise = Entreprise.query.get_or_404(entreprise_id)
+    user_form = UserForm()
 
-            db.session.commit()
+    if user_form.validate_on_submit():
+        # Vérifier si un utilisateur avec cet email existe déjà
+        existant_user = User.query.filter_by(email=user_form.email.data).first()
+        if existant_user:
+            flash("Un utilisateur avec cet email existe déjà. Veuillez en choisir un autre.", "danger")
+            return redirect(url_for('entreprise.ajouter_manager', entreprise_id=entreprise_id))
 
-            flash('Entreprise ajoutée avec succès.', 'success')
-        else:
-            flash("Un entreprise ou utilisateur existe déjà. Veuillez en choisir un autre.", "danger")
-            return render_template(
-                'entreprise/ajouter_entreprise_et_manager.html',
-                entreprise_form=entreprise_form,
-                user_form=user_form
-            )
+        # Créer le manager
+        manager_user = User(
+            name=user_form.name.data,
+            email=user_form.email.data,
+            role=user_form.role.data,
+            entreprise_id=entreprise_id
+        )
+        manager_user.set_password(user_form.password.data)
+        db.session.add(manager_user)
+        db.session.commit()
 
+        flash("Manager ajouté avec succès.", "success")
         return redirect(url_for('entreprise.liste_entreprises'))
 
     return render_template(
-        'entreprise/ajouter_entreprise_et_manager.html',
-        entreprise_form=entreprise_form,
-        user_form=user_form
+        'entreprise/ajouter_manager.html',
+        user_form=user_form,
+        entreprise=entreprise
     )
+
+
 
 
 @bp.route('/entreprise/<int:entreprise_id>', methods=['GET'])
@@ -130,6 +212,8 @@ def afficher_entreprise(entreprise_id):
         entreprise=entreprise,
         utilisateurs=utilisateurs
     )
+
+
 
 @bp.route('/veille/<int:entreprise_id>', methods=['GET'])
 @login_required
