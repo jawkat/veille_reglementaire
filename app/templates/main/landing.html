@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veille Réglementaire Pro - Votre Solution de Conformité</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='main.css') }}" />
+  <script defer src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <style>
+
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-primary);
+        }
+        
+      
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)),
+                      url('https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
+            position: relative;
+            color: var(--text-primary);
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+        }
+        
+        .feature-card {
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            overflow: hidden;
+            padding: 2rem;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--accent-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .testimonial-section {
+            background-color: var(--secondary-color);
+            padding: 100px 0;
+        }
+
+        .testimonial-card {
+            background-color: var(--background-light);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 1rem;
+            height: 100%;
+        }
+
+        .testimonial-card img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial-card:hover {
+            transform: scale(1.05);
+            transition: transform 0.3s ease;
+        }
+
+        .pricing-card {
+            background-color: var(--secondary-color);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+
+        .pricing-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .btn-custom {
+            background-color: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        .btn:hover {
+            background-color: #1d4ed8;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-section {
+            background-color: var(--secondary-color);
+            color: var(--text-primary);
+            padding: 80px 0;
+        }
+        
+        .timeline-section {
+            position: relative;
+            padding: 100px 0;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 50px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: var(--accent-color);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -9px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+        }
+
+        .stats-section {
+            background-color: var(--secondary-color);
+            padding: 80px 0;
+        }
+        
+        .stats-counter {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">VeillePro</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#features">Fonctionnalités</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#benefits">Avantages</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#pricing">Tarifs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.login') }}">Connexion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container" data-aos="fade-up">
+            <h1 class="display-4 mb-4">Simplifiez votre veille réglementaire</h1>
+            <p class="lead mb-5">Restez conforme et informé avec notre solution de veille réglementaire intelligente</p>
+            <button class="btn btn-light btn-lg px-4 me-2">Démarrer maintenant</button>
+            <button class="btn btn-outline-light btn-lg px-4">En savoir plus</button>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container py-5">
+            <h2 class="text-center mb-5" data-aos="fade-up">Fonctionnalités Innovantes</h2>
+            <div class="row">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card h-100">
+                        <div class="text-center">
+                            <i class="fas fa-chart-line feature-icon"></i>
+                            <h3 class="h4 mb-3">Tableaux de Bord</h3>
+                            <p>Visualisez vos données réglementaires avec des tableaux de bord interactifs et personnalisables.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card h-100">
+                        <div class="text-center">
+                            <i class="fas fa-bell feature-icon"></i>
+                            <h3 class="h4 mb-3">Alertes Intelligentes</h3>
+                            <p>Recevez des notifications personnalisées sur les changements réglementaires importants.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section id="process" class="timeline-section py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Notre Processus</h2>
+            <div class="timeline">
+                <div class="timeline-item" data-aos="fade-right">
+                    <div class="timeline-dot"></div>
+                    <h3>1. Analyse Initiale</h3>
+                    <p>Évaluation complète de vos besoins réglementaires</p>
+                </div>
+                <div class="timeline-item" data-aos="fade-right" data-aos-delay="100">
+                    <div class="timeline-dot"></div>
+                    <h3>2. Configuration</h3>
+                    <p>Mise en place personnalisée de votre tableau de bord</p>
+                </div>
+                <div class="timeline-item" data-aos="fade-right" data-aos-delay="200">
+                    <div class="timeline-dot"></div>
+                    <h3>3. Surveillance Continue</h3>
+                    <p>Monitoring 24/7 des évolutions réglementaires</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-4" data-aos="fade-up">
+                    <div class="stats-counter">500+</div>
+                    <p>Entreprises nous font confiance</p>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stats-counter">10,000+</div>
+                    <p>Alertes envoyées</p>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stats-counter">99%</div>
+                    <p>Taux de satisfaction client</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonial-section py-5">
+        <div class="container d-flex flex-column justify-content-center">
+            <h2 class="text-center mb-5">Ce que disent nos clients</h2>
+            <div class="swiper-container">
+                <div class="swiper-wrapper d-flex flex-row flex-nowrap">
+                    <div class="swiper-slide">
+                        <div class="testimonial-card mx-auto" data-aos="fade-right" data-aos-duration="800">
+                            <img src="/static/images/pr1.png" alt="Marie Dubois" class="img-fluid rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <p class="mb-4">"VeillePro a transformé notre approche de la conformité réglementaire. Un outil indispensable."</p>
+                            <h5 class="text-center text-primary">Marie Dubois</h5>
+                            <p class="text-muted badge bg-secondary text-center">Directrice Conformité, Entreprise A</p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="testimonial-card mx-auto" data-aos="fade-up" data-aos-duration="800">
+                            <img src="/static/images/pr2.jpg" alt="Jean Martin" class="img-fluid rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <p class="mb-4">"La meilleure solution de veille réglementaire que nous ayons utilisée."</p>
+                            <h5 class="text-center text-primary">Jean Martin</h5>
+                            <p class="text-muted badge bg-secondary text-center">Responsable Juridique, Entreprise B</p>
+                        </div>
+                    </div>
+                    <div class="swiper-slide">
+                        <div class="testimonial-card mx-auto" data-aos="fade-left" data-aos-duration="800">
+                            <img src="/static/images/pr1.png" alt="Pierre Robert" class="img-fluid rounded-circle mb-3" style="width: 80px; height: 80px;">
+                            <p class="mb-4">"VeillePro est une solution exceptionnelle pour les entreprises qui cherchent à simplifier leur conformité réglementaire."</p>
+                            <h5 class="text-center text-primary">Pierre Robert</h5>
+                            <p class="text-muted badge bg-secondary text-center">Directeur Général, Entreprise C</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+<section id="pricing" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 text-primary">Nos Offres</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            <!-- Offre Starter -->
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Starter</h5>
+                        <p class="card-text text-center">
+                            Un outil conforme aux exigences de certification, adapté à vos besoins de veille réglementaire.
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <span class="display-4 text-primary">4 500 DH</span>
+                            <span class="text-muted h5">par an</span>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">1 accès utilisateur</li>
+                        <li class="list-group-item">Registre réglementaire personnalisé</li>
+                        <li class="list-group-item">Alerte email</li>
+                        <li class="list-group-item">Support par email</li>
+                        <li class="list-group-item">Fiche d’évaluation des textes en téléchargement libre</li>
+                        <li class="list-group-item">Gestion des accès sécurisés</li>
+                    </ul>
+                    <div class="card-footer text-center">
+                        <a href="#contact" class="btn btn-lg btn-primary">Commencer</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offre Professional -->
+            <div class="col">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Professional</h5>
+                        <p class="card-text text-center">
+                            Une solution complète avec des fonctionnalités avancées pour votre entreprise.
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <span class="display-4 text-primary">9 000 DH</span>
+                            <span class="text-muted h5">par an</span>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Jusqu'à 5 accès utilisateurs</li>
+                        <li class="list-group-item">Veille réglementaire avancée</li>
+                        <li class="list-group-item">Registre réglementaire personnalisé</li>
+
+                        <li class="list-group-item">Formation gratuite</li>
+                        <li class="list-group-item">Support prioritaire</li>
+                        <li class="list-group-item">Application de gestion de conformité</li>
+                        <li class="list-group-item">Espace statistiques</li>
+                        <li class="list-group-item">Base de téléchargement libre</li>
+                    </ul>
+                    <div class="card-footer text-center">
+                        <a href="#contact" class="btn btn-lg btn-primary">Choisir ce plan</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Offre Enterprise -->
+            <div class="col">
+                <div class="card h-100 border-primary">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Enterprise</h5>
+                        <p class="card-text text-center">
+                            Une solution sur mesure pour répondre aux besoins des grandes entreprises.
+                        </p>
+                        <div class="d-flex justify-content-center">
+                            <span class="display-4 text-primary">À partir de 14 000 DH</span>
+                        </div>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Accès illimités</li>
+                        <li class="list-group-item">Solution personnalisée</li>
+                        <li class="list-group-item">Intégration sur mesure</li>
+                        <li class="list-group-item">Support dédié 24/7</li>
+                        <li class="list-group-item">Formation sur site</li>
+                        <li class="list-group-item">Entretien consultant pour personnalisation</li>
+                        <li class="list-group-item">Veille réglementaire continue</li>
+
+                        <li class="list-group-item">Espace news et service relation client</li>
+                    </ul>
+                    <div class="card-footer text-center">
+                        <a href="#contact" class="btn btn-lg btn-primary">Nous contacter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- CTA Section -->
+    <section class="cta-section text-center">
+        <div class="container" data-aos="fade-up">
+            <h2 class="mb-4">Prêt à simplifier votre veille réglementaire ?</h2>
+            <p class="lead mb-4">Rejoignez les entreprises qui nous font confiance</p>
+            <form class="row justify-content-center" action="/inscription" method="POST">
+                <div class="col-md-6 col-lg-4">
+                    <div class="input-group mb-3">
+                        <input type="email" class="form-control" placeholder="Votre adresse email" required>
+                        <button class="btn btn-custom" type="submit">S'inscrire</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="text-center text-lg-start py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5 class="accent-text">VeillePro</h5>
+                    <p>Votre partenaire en conformité réglementaire</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-light me-3"><i class="fab fa-linkedin"></i></a>
+                        <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-light"><i class="fab fa-facebook"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5>Liens Rapides</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="nav-link">À propos</a></li>
+                        <li><a href="#" class="nav-link">Blog</a></li>
+                        <li><a href="#" class="nav-link">Carrières</a></li>
+                        <li><a href="#" class="nav-link">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Contact</h5>
+                    <p>Email: contact@veillepro.com<br>Tél: +212 000 00 00 00</p>
+                    <address class="mt-3">
+                      Avenue Mohamed V, 2, Fes, Maroc
+                    </address>
+                </div>
+            </div>
+            <hr class="my-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 VeillePro. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // Initialize Swiper
+        new Swiper('.swiper-container', {
+            slidesPerView: 1,
+            spaceBetween: 30,
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true
+            },
+            breakpoints: {
+                768: {
+                    slidesPerView: 2
+                },
+                1024: {
+                    slidesPerView: 3
+                }
+            }
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

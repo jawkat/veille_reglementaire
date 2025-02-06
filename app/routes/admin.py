@@ -110,7 +110,7 @@ def login():
 def logout():
     logout_user()
     flash('Déconnexion réussie.', 'info')
-    return redirect(url_for('admin.login'))
+    return redirect(url_for('main.landing_page'))
 
 @bp.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():

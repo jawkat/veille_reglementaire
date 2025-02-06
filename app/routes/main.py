@@ -11,7 +11,11 @@ bp = Blueprint('main', __name__)
 
 
 
-@bp.route('/')
+@bp.route('/home')
 @login_required
 def index():
     return render_template('main/index.html')
+
+@bp.route('/')
+def landing_page():
+    return render_template('main/landing.html')
