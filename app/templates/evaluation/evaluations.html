@@ -1,11 +1,263 @@
 {% extends "layout.html" %}
 
+{% block styles %}
+<style>
+    .evaluation-container {
+        padding: 2rem;
+    }
+
+    .page-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .score-badge {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        color: #495057;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .score-value {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #0d6efd;
+    }
+
+    .accordion {
+        border-radius: 12px;
+        overflow: visible;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .accordion-item {
+        border: 1px solid rgba(0,0,0,.125);
+        margin-bottom: 1rem;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .accordion-item:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .accordion-item:last-child {
+        border-bottom: none;
+    }
+
+    .accordion-header {
+        margin: 0;
+    }
+
+    .accordion-button {
+        padding: 1.5rem;
+        background-color: white;
+        font-weight: 500;
+        border-radius: 8px !important;
+        transition: all 0.2s ease;
+    }
+
+    .accordion-button:hover {
+        background-color: #f8f9fa;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(13, 110, 253, 0.25);
+    }
+
+    .article-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 0.25rem 0;
+    }
+
+    .article-number {
+        font-weight: 600;
+        color: #495057;
+        min-width: 100px;
+    }
+
+    .article-title {
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    .badge-group {
+        display: flex;
+        gap: 2rem;
+        margin-left: auto;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+
+    .badge-group::before {
+        content: '';
+        width: 1px;
+        height: 24px;
+        background: linear-gradient(to bottom, transparent, #dee2e6, transparent);
+        margin-right: 2rem;
+    }
+
+    .badge-label {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-right: 0.75rem;
+    }
+
+    .badge-pair {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .bg-success-light {
+        background-color: #d1e7dd !important;
+        color: #0f5132;
+    }
+
+    .bg-danger-light {
+        background-color: #f8d7da !important;
+        color: #842029;
+    }
+
+    .status-badge {
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border-radius: 50%;
+        font-size: 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+    }
+
+    .status-badge-text {
+        font-size: 0.875rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        display: inline-flex;
+        align-items: center;
+        white-space: nowrap;
+        color: #6c757d;
+    }
+
+    .status-badge-text i {
+        color: #adb5bd;
+    }
+
+    .status-badge.bg-light {
+        background-color: #f8f9fa !important;
+        border: 1px solid #dee2e6;
+    }
+
+    .accordion-body {
+        padding: 1.5rem;
+        background-color: #f8f9fa;
+        margin: 0 1rem 1rem 1rem;
+        border-radius: 8px;
+    }
+
+    .content-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(0,0,0,.125);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .content-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .action-button {
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .action-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .alert-custom {
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .alert-icon {
+        font-size: 1.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h4 class="text-center">Évaluations de la réglementation "{{ reglementation.titre }}"</h4>
-<div class="text-end w-100">Score : {{ score }}</div>
+<div class="evaluation-container bg-light py-4">
+    <div class="container">
+    <div class="page-header bg-white shadow-sm">
+        <div class="d-flex justify-content-between align-items-start">
+            <h1 class="page-title">
+                <i class="fas fa-clipboard-check me-2"></i>
+                Évaluations de la réglementation
+            </h1>
+            <div class="score-badge d-flex align-items-center gap-2 bg-primary bg-opacity-10 text-primary fw-semibold">
+                <i class="fas fa-chart-line"></i>
+                Score: <span class="score-value">{{ score }}</span>
+            </div>
+        </div>
+        <div class="mt-3 p-3 bg-light rounded-3 border">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-file-alt text-secondary"></i>
+                <span class="text-secondary">{{ reglementation.titre }}</span>
+            </div>
+        </div>
+    </div>
 
 {% if suivi %}
-  {% if articles %}
+    {% if articles %}
     <div class="accordion" id="accordionArticles">
       {% for article in articles %}
         {% set evaluation = evaluations_dict.get(article.id) %}
@@ -14,38 +266,59 @@
           <h2 class="accordion-header" id="heading{{ loop.index }}">
             <div class="d-flex align-items-center justify-content-between w-100">
 
-              <!-- Bouton de l'accordéon -->
               <button class="accordion-button flex-grow-1 text-start me-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
-                Article N°{{ article.numero }} - {{ article.titre or 'Titre non spécifié' }}
+                <div class="article-header">
+                    <span class="article-number">Article N°{{ article.numero }}</span>
+                    <span class="article-title">{{ article.titre or 'Titre non spécifié' }}</span>
 
                 <!-- Affichage des badges -->
                 {% if evaluation %}
-                  <span class="ms-3">
+                  <div class="badge-group">
+                    <div class="badge-pair">
+                    <span class="badge-label">Applicable :</span>
                     {% if evaluation.applicable.name == "OUI" %}
-                      <span class="badge bg-success" title="Applicable: Oui">Applicable: Oui</span>
+                      <span class="status-badge bg-success" title="Applicable">
+                        <i class="fas fa-check"></i>
+                      </span>
                     {% elif evaluation.applicable.name == "NON" %}
-                      <span class="badge bg-danger" title="Applicable: Non">Applicable: Non</span>
+                      <span class="status-badge bg-danger" title="Non Applicable">
+                        <i class="fas fa-times"></i>
+                      </span>
                     {% elif evaluation.applicable.name == "INFO" %}
-                      <span class="badge bg-primary" title="Applicable: Non">Applicable: Information</span>
+                      <span class="status-badge bg-primary" title="Information">
+                        <i class="fas fa-info"></i>
+                      </span>
                     {% else %}
-                      <span class="badge bg-secondary" title="Applicable: Non évalué">Applicable: Non évalué</span>
+                      <span class="status-badge-text text-secondary" title="Non évalué">
+                        <i class="fas fa-minus me-1"></i>Non évalué
+                      </span>
                     {% endif %}
-                  </span>
-                  <span class="ms-2">
+                    </div>
+
+                    <div class="badge-pair">
+                    <span class="badge-label">Conformité :</span>
                     {% if evaluation.conforme.name == "CONFORME" %}
-                      <span class="badge bg-success" title="Conforme: Conforme">Conforme: Conforme</span>
+                      <span class="status-badge bg-success-light" title="Conforme">
+                        <i class="fas fa-check"></i>
+                      </span>
                     {% elif evaluation.conforme.name == "NON_CONFORME" %}
-                      <span class="badge bg-danger" title="Conforme: Non conforme">Conforme: Non conforme</span>
+                      <span class="status-badge bg-danger-light" title="Non conforme">
+                        <i class="fas fa-times"></i>
+                      </span>
                     {% else %}
-                      <span class="badge bg-secondary" title="Conforme: Non évalué">Conforme: Non évalué</span>
+                      <span class="status-badge-text text-secondary" title="Non évalué">
+                        <i class="fas fa-minus me-1"></i>Non évalué
+                      </span>
                     {% endif %}
-                  </span>
+                  </div>
+                </div>
               </button>
 
-              <!-- Bouton Modifier -->
               {% if evaluation %}
-              <a href="{{ url_for('evaluation.modifier_evaluation', evaluation_id=evaluation.id) }}" class="btn btn-warning">
-                Modifier
+              <a href="{{ url_for('evaluation.modifier_evaluation', evaluation_id=evaluation.id) }}" 
+                 class="btn btn-warning action-button d-flex align-items-center gap-2 px-3">
+                <i class="fas fa-edit"></i>
+                <span>Modifier</span>
               </a>
               {% endif %}
                 {% endif %}
@@ -55,16 +328,35 @@
 
           <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}" data-bs-parent="#accordionArticles">
             <div class="accordion-body">
-              <!-- Contenu de l'article -->
-              <p><strong>Contenu:</strong></p>
-              {% for ligne in article.contenu.split('\n') %}
-                <p>{{ ligne }}</p>
-              {% endfor %}
+              <div class="content-section">
+                <h5 class="section-title"><i class="fas fa-file-alt me-2"></i>Contenu de l'article</h5>
+                {% for ligne in article.contenu.split('\n') %}
+                  <p class="mb-2">{{ ligne }}</p>
+                {% endfor %}
+              </div>
+
               {% if evaluation %}
-                <p><strong>Champ d'application:</strong> {{ evaluation.champ_d_application if evaluation.champ_d_application else "Non spécifié" }}</p>
-                <p><strong>Commentaires:</strong> {{ evaluation.commentaires if evaluation.commentaires else "RAS" }}</p>
+                <div class="content-section">
+                  <h5 class="section-title d-flex align-items-center gap-2">
+                    <span class="badge bg-primary bg-opacity-10 text-primary p-2">
+                        <i class="fas fa-tasks"></i>
+                    </span>
+                    Évaluation
+                  </h5>
+                  <div class="mb-3">
+                    <strong class="text-muted">Champ d'application:</strong>
+                    <p class="ms-3 mb-2">{{ evaluation.champ_d_application if evaluation.champ_d_application else "Non spécifié" }}</p>
+                  </div>
+                  <div>
+                    <strong class="text-muted">Commentaires:</strong>
+                    <p class="ms-3 mb-0">{{ evaluation.commentaires if evaluation.commentaires else "RAS" }}</p>
+                  </div>
+                </div>
               {% else %}
-                <p><em>Aucune évaluation disponible pour cet article.</em></p>
+                <div class="alert alert-custom alert-info">
+                  <i class="fas fa-info-circle alert-icon"></i>
+                  <div>Aucune évaluation n'est disponible pour cet article.</div>
+                </div>
               {% endif %}
             </div>
           </div>
@@ -74,11 +366,18 @@
       {% endfor %}
     </div>
 
-  {% else %}
-    <p>Aucun article associé à cette réglementation.</p>
-  {% endif %}
+    {% else %}
+      <div class="alert alert-warning d-flex align-items-center gap-3 shadow-sm">
+        <i class="fas fa-exclamation-triangle alert-icon"></i>
+        <div>Aucun article n'est associé à cette réglementation.</div>
+      </div>
+    {% endif %}
 {% else %}
-  <p>L'entreprise ne suit pas cette réglementation.</p>
+  <div class="alert alert-danger d-flex align-items-center gap-3 shadow-sm">
+    <i class="fas fa-ban alert-icon"></i>
+    <div>L'entreprise ne suit pas cette réglementation.</div>
+  </div>
 {% endif %}
+</div>
 
 {% endblock %}

@@ -1,15 +1,128 @@
 {% extends "layout.html" %}
 
+{% block styles %}
+<style>
+    .veille-container {
+        padding: 2rem;
+    }
+
+    .page-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .reglementations-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .table-container {
+        padding: 1rem;
+    }
+
+    .reglementations-table {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px #e9ecef;
+    }
+
+    .reglementations-table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+        color: #495057;
+        font-weight: 600;
+        padding: 1rem;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+    }
+
+    .reglementations-table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .reglementations-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .status-badge {
+        padding: 0.5em 1em;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-badge.suivi {
+        background-color: #d1e7dd;
+        color: #0f5132;
+    }
+
+    .status-badge.non-suivi {
+        background-color: #f8d7da;
+        color: #842029;
+    }
+
+    .score-badge {
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+
+    .action-button {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .action-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .titre-cell {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .type-badge {
+        background-color: #e2e3e5;
+        color: #41464b;
+        padding: 0.5em 1em;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <h2 class="mt-2">Réglementations associées</h2>
-    <table class="table table-bordered mt-2">
+    <div class="veille-container">
+        <h2 class="page-title">
+            <i class="fas fa-clipboard-list me-2"></i>Réglementations associées
+        </h2>
+        <div class="reglementations-card">
+            <div class="table-container">
+                <table class="table reglementations-table">
         <thead>
             <tr>
-                <th>Article</th>
-                <th>type</th>
-                <th>suivi</th>
-                <th>Score</th>
-                <th>consulter</th>
+                <th><i class="fas fa-file-alt me-2"></i>Article</th>
+                <th><i class="fas fa-tag me-2"></i>Type</th>
+                <th><i class="fas fa-check-circle me-2"></i>Suivi</th>
+                <th><i class="fas fa-star me-2"></i>Score</th>
+                <th><i class="fas fa-eye me-2"></i>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -19,14 +132,28 @@
 
 
             <tr>
-                <td>{{ entreprise_reglementation.reglementation.titre }}</td>
-                <td>{{ entreprise_reglementation.reglementation.type_texte }}</td>
-                <td>{{ "OUI" if entreprise_reglementation.suivi  else "Non" }}</td>
-                <td>{{ entreprise_reglementation.score }}</td>
-
+                <td class="titre-cell" title="{{ entreprise_reglementation.reglementation.titre }}">{{ entreprise_reglementation.reglementation.titre }}</td>
+                <td>
+                    <span class="type-badge">
+                        {{ entreprise_reglementation.reglementation.type_texte }}
+                    </span>
+                </td>
+                <td>
+                    <span class="status-badge {{ 'suivi' if entreprise_reglementation.suivi else 'non-suivi' }}">
+                        <i class="fas {{ 'fa-check' if entreprise_reglementation.suivi else 'fa-times' }}"></i>
+                        {{ "Suivi" if entreprise_reglementation.suivi else "Non suivi" }}
+                    </span>
+                </td>
+                <td>
+                    <span class="score-badge">
+                        <i class="fas fa-star me-1"></i>{{ entreprise_reglementation.score }}
+                    </span>
+                </td>
                 <td>
                     <a href="{{ url_for('evaluation.afficher_evaluations', entreprise_id=entreprise.id,reglementation_id = entreprise_reglementation.reglementation.id ) }}"
-                        class="btn btn-primary btn-sm">Voir</a>
+                        class="btn btn-primary btn-sm action-button">
+                        <i class="fas fa-eye me-1"></i>Consulter
+                    </a>
                 </td>
 
             </tr>
@@ -34,5 +161,13 @@
             {% endfor %}
         </tbody>
     </table>
-</div>
+    {% if not entreprise.reglementations %}
+        <div class="alert alert-info d-flex align-items-center mt-3">
+            <i class="fas fa-info-circle me-3 fs-4"></i>
+            <div>Aucune réglementation n'est associée à cette entreprise.</div>
+        </div>
+    {% endif %}
+            </div>
+        </div>
+    </div>
 {% endblock %}

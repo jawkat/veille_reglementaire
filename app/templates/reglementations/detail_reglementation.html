@@ -1,51 +1,213 @@
 {% extends "layout.html" %}
 
+{% block styles %}
+<style>
+    .detail-card {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 12px;
+    }
+    
+    .detail-card .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0,0,0,0.1);
+        padding: 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .detail-card .card-header h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .detail-card .card-body {
+        padding: 2rem;
+    }
+
+    .detail-info {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-info strong {
+        color: #495057;
+        font-weight: 600;
+    }
+
+    .detail-section {
+        background-color: #fff;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+
+    .detail-section h5 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .badge {
+        padding: 0.5em 1em;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 20px;
+    }
+
+    .status-badge {
+        margin-bottom: 1rem;
+    }
+
+    .action-button {
+        padding: 0.5rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .action-button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .table {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px #e9ecef;
+    }
+
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #e9ecef;
+        color: #495057;
+        font-weight: 600;
+        padding: 1rem;
+    }
+
+    .table tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.02);
+    }
+
+    .btn-group-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .secteur-list {
+        list-style: none;
+        padding-left: 0;
+    }
+
+    .secteur-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .secteur-list li:last-child {
+        border-bottom: none;
+    }
+
+    .version-badge {
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 0.25rem 0.75rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .card-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding: 1rem 1.5rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <div class="card mt-3">
+    <div class="card detail-card mt-3">
         <div class="card-header">
-            <h3>{{ reglementation.titre }}</h3>
-            <div class="">
-                {% if reglementation.id in suivi_map %}
-                {% if suivi_map[reglementation.id] %}
-                    <span class="badge bg-success">Suivi</span>
-                {% else %}
-                    <span class="badge bg-danger">Non suivi</span>
-                {% endif %}
-            {% else %}
-                <span class="badge bg-secondary">Inconnu</span>
-            {% endif %}
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h3 class="mb-0">{{ reglementation.titre }}</h3>
+                <div class="status-badges d-flex gap-2 align-items-center">
+                    {% if reglementation.id in suivi_map %}
+                        {% if suivi_map[reglementation.id] %}
+                            <span class="badge bg-success d-flex align-items-center gap-2">
+                                <i class="fas fa-check-circle"></i>Suivi
+                            </span>
+                        {% else %}
+                            <span class="badge bg-danger d-flex align-items-center gap-2">
+                                <i class="fas fa-times-circle"></i>Non suivi
+                            </span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-secondary d-flex align-items-center gap-2">
+                            <i class="fas fa-question-circle"></i>Inconnu
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="badge bg-info d-flex align-items-center gap-2">
+                    <i class="fas fa-calendar"></i>
+                    {{ reglementation.date_publication.strftime('%d/%m/%Y') }}
+                </span>
+                <span class="badge bg-primary d-flex align-items-center gap-2">
+                    <i class="fas fa-file-alt"></i>
+                    {{ reglementation.type_texte }}
+                </span>
+                <span class="badge bg-secondary d-flex align-items-center gap-2">
+                    <i class="fas fa-building"></i>
+                    {{ reglementation.source }}
+                </span>
             </div>
         </div>
         <div class="card-body">
 
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Type de Texte :</strong> {{
+                    <div class="detail-section">
+                        <h5>Informations Générales</h5>
+                        <div class="detail-info"><strong>Type de Texte :</strong> {{
                         reglementation.type_texte }}</p>
-                    <p><strong>Date de Publication :</strong> {{
+                        </div>
+                        <div class="detail-info"><strong>Date de Publication :</strong> {{
                         reglementation.date_publication.strftime('%d/%m/%Y')
                         }}</p>
-                    <p><strong>Source :</strong> {{ reglementation.source }}</p>
+                        </div>
+                        <div class="detail-info"><strong>Source :</strong> {{ reglementation.source }}</div>
 
                     {% if reglementation.versions %}
-                    <p><strong>Version :</strong> {{
+                        <div class="detail-info"><strong>Version :</strong> <span class="version-badge">{{
                         "{:02}".format(reglementation.versions[-1].version_numero)
                         }}</p>
                     {% else %}
-                    <p><strong>Version :</strong> Aucune version disponible</p>
+                        <div class="detail-info"><strong>Version :</strong> <span class="version-badge">Aucune version disponible</span></div>
                     {% endif %}
 
 
 
                 </div>
+                    </div>
+                </div>
                 <div class="col-md-6">
-                    <p><strong>Thème :</strong> {{ theme.nom if theme else
+                    <div class="detail-section">
+                        <h5>Classification</h5>
+                        <div class="detail-info"><strong>Thème :</strong> {{ theme.nom if theme else
                         "Non spécifié" }}</p>
-                    <p><strong>Sous-Domaine :</strong> {{ sous_domaine.nom if
+                        </div>
+                        <div class="detail-info"><strong>Sous-Domaine :</strong> {{ sous_domaine.nom if
                         sous_domaine else "Non spécifié" }}</p>
-                    <h5 class="mt-4">Secteurs Associés :</h5>
-                    <ul>
+                        </div>
+                        <h5 class="mt-4">Secteurs Associés</h5>
+                        <ul class="secteur-list">
                         {% for secteur in secteurs %}
                         <li>{{ secteur.secteur.nom }}</li>
                         {% else %}
@@ -57,7 +219,7 @@
 
                         <!-- Bouton pour Suivre ou Dissocier -->
                 <button id="toggle-suivi-btn" 
-                        class="btn float-end  {% if reglementation.id in suivi_map and suivi_map[reglementation.id] %}btn-danger{% else %}btn-success{% endif %}"
+                        class="btn float-end action-button {% if reglementation.id in suivi_map and suivi_map[reglementation.id] %}btn-danger{% else %}btn-success{% endif %}"
                         style="width: 150px"
                         data-reglementation-id="{{ reglementation.id }}"
                         data-action="{% if reglementation.id in suivi_map and suivi_map[reglementation.id] %}dissocier{% else %}suivre{% endif %}">
@@ -71,19 +233,21 @@
             <hr class="mt-5">
             {% if current_user.is_authenticated and current_user.role.name == 'ADMIN' %}
             <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
-                class="btn btn-success float-end sticky-md-top">
+                class="btn btn-success action-button float-end sticky-md-top">
                 Ajouter un Article
             </a>
         {% endif %}
             <!-- Affichage des articles -->
-            <h5>Articles :</h5>
+            <div class="detail-section">
+                <h5><i class="fas fa-file-alt me-2"></i>Articles</h5>
             {% if reglementation.articles %}
-            <table class="table table-striped">
-                <thead>
+            <div class="table-responsive shadow-sm">
+                <table class="table table-striped table-hover mb-0">
+                <thead class="table-light">
                     <tr>
-                        <th>Numéro</th>
-                        <th>Contenu</th>
-                        <th>action</th>
+                        <th style="width: 15%"><i class="fas fa-hashtag me-2"></i>Numéro</th>
+                        <th><i class="fas fa-file-text me-2"></i>Contenu</th>
+                        <th style="width: 20%" class="text-center"><i class="fas fa-cogs me-2"></i>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -96,65 +260,79 @@
                     </tr>
 
                     <tr>
-                        <td>{{ article.numero }}</td>
-                        <td>
+                        <td class="align-middle">{{ article.numero }}</td>
+                        <td class="text-justify">
                             {% for ligne in article.contenu.split('\n') %}
-                            <p>{{ ligne }}</p>
+                            <p class="mb-1">{{ ligne }}</p>
                             {% endfor %}
                         </td>
                         <td>
-                        <a href="{{ url_for('article.modifier_article', article_id=article.id) }}"
-                            class="btn btn-warning">
-                            Modifier
-                        </a>
-                            <form method="POST" action="{{ url_for('article.supprimer_article', article_id=article.id) }}" style="display: inline;">
-                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
-                                    Supprimer
-                                </button>
-                            </form>
+                            <div class="btn-group-actions">
+                                <a href="{{ url_for('article.modifier_article', article_id=article.id) }}"
+                                    class="btn btn-warning action-button btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Modifier
+                                </a>
+                                <form method="POST" action="{{ url_for('article.supprimer_article', article_id=article.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-danger action-button btn-sm" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                        <i class="fas fa-trash-alt me-1"></i>Supprimer
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
 
                 </tbody>
-            </table>
+                </table>
+            </div>
             {% else %}
-            <p>Aucun article associé.</p>
+            <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle me-3 fs-4"></i>
+                <div>Aucun article n'est associé à cette réglementation.</div>
+            </div>
             {% endif %}
+            </div>
 
             <hr>
 
             <!-- Affichage des versions -->
-            <h5>Versions :</h5>
+            <div class="detail-section">
+                <h5><i class="fas fa-code-branch me-2"></i>Versions</h5>
             {% if reglementation.versions %}
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Numéro de Version</th>
-                        <th>Contenu</th>
-                        <th>Date mise à jour</th>
-                    </tr>
-                </thead>
+            <div class="table-responsive shadow-sm">
+                <table class="table table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag me-2"></i>Numéro de Version</th>
+                            <th><i class="fas fa-file-alt me-2"></i>Contenu</th>
+                            <th><i class="fas fa-calendar-alt me-2"></i>Date mise à jour</th>
+                        </tr>
+                    </thead>
                 <tbody>
                     {% for version in reglementation.versions %}
                     <tr>
-                        <td>{{ version.version_numero }}</td>
-                        <td>{{ version.contenu }}</td>
-                        <td>{{ version.date_creation.strftime('%d/%m/%Y')
-                            }}</td>
+                        <td class="align-middle text-center">{{ version.version_numero }}</td>
+                        <td class="text-justify">{{ version.contenu }}</td>
+                        <td class="align-middle text-center">{{ version.date_creation.strftime('%d/%m/%Y') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>
+                </table>
+            </div>
             {% else %}
-            <p>Aucune version associée.</p>
+            <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle me-3 fs-4"></i>
+                <div>Aucune version n'est associée à cette réglementation.</div>
+            </div>
             {% endif %}
+            </div>
         </div>
         <div class="card-footer d-flex justify-content-between">
 
         
-            <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary">
-                Retour à la liste
+            <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary action-button">
+                <i class="fas fa-arrow-left me-2"></i>Retour à la liste
             </a>
         </div>
     </div>
