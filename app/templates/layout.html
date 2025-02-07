@@ -24,7 +24,9 @@
       
   </head>
 
-  <body>
+
+  
+  <body class="layout-body">
     {% if current_user.is_authenticated %}
     <header class="site-header sticky-top">
       <nav class="navbar navbar-expand-lg navbar-dark">
@@ -115,7 +117,8 @@
 
     <!-- Main content container -->
     <div class="container mt-3">
-        {% include 'main/flash_msg.html' %} {%block content %}{% endblock %}</div>
+        {% include 'main/flash_msg.html' %} {%block content %}
+        {% endblock %}</div>
 
     <!-- Bootstrap JS -->
     <script

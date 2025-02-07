@@ -1,23 +1,192 @@
 :root {
-  --nomai : #5d91a5;
-  --vert : #797d73;
-
-  --roze: #fc83cd33;
-  --blue: #0b76b488;
-
+    --nomai: #5d91a5;
+    --vert: #797d73;
+    --roze: #fc83cd33;
+    --blue: #0b76b488;
+    --primary-color: #0a192f;
+    --secondary-color: #172a45;
+    --accent-color: #64ffda;
+    --text-primary: #ccd6f6;
+    --background-light: #233554;
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: var(--primary-color);
+    color: var(--text-primary);
+}
+
+.hero-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(rgba(10, 25, 47, 0.8), rgba(10, 25, 47, 0.8)),
+                url('https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') no-repeat center center/cover;
+    position: relative;
+    color: var(--text-primary);
+    padding: 100px 0;
+    text-align: center;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.accent-text {
+    color: var(--accent-color);
+}
+
+.feature-card {
+    background-color: var(--secondary-color);
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+    overflow: hidden;
+    padding: 2rem;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    color: var(--accent-color);
+    margin-bottom: 1.5rem;
+}
+
+.testimonial-section {
+    background-color: var(--secondary-color);
+    padding: 100px 0;
+}
+
+.testimonial-card {
+    background-color: var(--background-light);
+    border-radius: 15px;
+    padding: 2rem;
+    margin: 1rem;
+    height: 100%;
+}
+
+.testimonial-card img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.testimonial-card:hover {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+.pricing-card {
+    background-color: var(--secondary-color);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.pricing-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: box-shadow 0.3s ease;
+}
+
+.btn-custom {
+    background-color: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 0.8rem 2rem;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: var(--accent-color);
+    color: var(--primary-color);
+}
+
+.btn:hover {
+    background-color: #1d4ed8;
+    color: white;
+    transition: background-color 0.3s ease;
 }
 
 .btn-primary {
-background-color: var(--vert) ;
-border: none;
+    background-color: var(--vert);
+    border: none;
 }
 
 .btn-primary:hover {
-background-color: var(--nomai);
+    background-color: var(--nomai);
+}
+
+.cta-section {
+    background-color: var(--secondary-color);
+    color: var(--text-primary);
+    padding: 80px 0;
+}
+
+.timeline-section {
+    position: relative;
+    padding: 100px 0;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 50px;
+    margin-bottom: 50px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background-color: var(--accent-color);
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -9px;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+}
+
+.stats-section {
+    background-color: var(--secondary-color);
+    padding: 80px 0;
+}
+
+.stats-counter {
+    font-size: 3rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+    }
+    
+    .feature-card {
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-item {
+        padding-left: 30px;
+    }
+}
 
 }
 
@@ -172,3 +341,11 @@ background-color: var(--nomai);
 .nav-link:hover::after {
   width: 100%;
 }
+
+/* Specific styles for layout page */
+.layout-body {
+    background-color: white !important;
+    color: var(--text-secondary);
+    color: var(--primary-color);
+}
+
