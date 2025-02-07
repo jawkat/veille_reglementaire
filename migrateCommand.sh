@@ -22,3 +22,5 @@ flask db migrate -m "tester uuid"
 flask db migrate -m "ajout suppression automatique des relation entreprises"
 
 flask db migrate -m "ajout csacsad all"
+
+flask db migrate -m "nouvelle modele"

@@ -14,12 +14,27 @@ class RoleUtilisateur(Enum):
     MANAGER = "Manager"
     RESPONSABLE = "Responsable Veille"
     COLLABORATEUR = "Collaborateur"
+    AUDITEUR = "Auditeur"
+    CONSULTANT = "Consultant"
 
 class ApplicableEnum(Enum):
     OUI = "Oui"
     NON_EVALUE = "Non évalué"
     NON = "Non"
     INFO = "Information"
+    PARTIEL = "Partiellement Applicable"
+
+class SeveriteEnum(Enum):
+    FAIBLE = "Faible"
+    MOYEN = "Moyen"
+    ELEVE = "Élevé"
+    CRITIQUE = "Critique"
+
+class StatutAlerte(Enum):
+    NOUVEAU = "Nouveau"
+    EN_COURS = "En cours"
+    TRAITE = "Traité"
+    ARCHIVE = "Archivé"
 
 class ConformeEnum(Enum):
     CONFORME = "Conforme"
@@ -76,6 +91,62 @@ class EntrepriseSecteur(db.Model):
     __tablename__ = 'entreprise_secteur'
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), primary_key=True)
     secteur_id = db.Column(db.Integer, db.ForeignKey('secteur.id'), primary_key=True)
+
+# Nouvelles classes pour la gestion avancée de la veille réglementaire
+
+class RealTimeAlert(db.Model):
+    __tablename__ = 'real_time_alert'
+    id = db.Column(db.Integer, primary_key=True)
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
+    reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=True)
+    titre = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    severite = db.Column(db.Enum(SeveriteEnum), nullable=False)
+    statut = db.Column(db.Enum(StatutAlerte), default=StatutAlerte.NOUVEAU)
+    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
+    date_traitement = db.Column(db.DateTime, nullable=True)
+    traite_par_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=True)
+
+class DashboardSetting(db.Model):
+    __tablename__ = 'dashboard_setting'
+    id = db.Column(db.Integer, primary_key=True)
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=False)
+    configuration = db.Column(db.JSON, nullable=False)
+    derniere_modification = db.Column(db.DateTime, default=datetime.utcnow)
+
+class IntegrationSetting(db.Model):
+    __tablename__ = 'integration_setting'
+    id = db.Column(db.Integer, primary_key=True)
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
+    nom_service = db.Column(db.String(100), nullable=False)
+    type_integration = db.Column(db.String(50), nullable=False)
+    configuration = db.Column(db.JSON, nullable=False)
+    actif = db.Column(db.Boolean, default=True)
+    derniere_synchronisation = db.Column(db.DateTime, nullable=True)
+
+class HistoriqueEvaluation(db.Model):
+    __tablename__ = 'historique_evaluation'
+    id = db.Column(db.Integer, primary_key=True)
+    entreprise_reglementation_id = db.Column(db.Integer, db.ForeignKey('entreprise_reglementation.id'), nullable=False)
+    date_evaluation = db.Column(db.DateTime, default=datetime.utcnow)
+    score_precedent = db.Column(db.Integer, nullable=True)
+    nouveau_score = db.Column(db.Integer, nullable=False)
+    evaluateur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=False)
+    commentaire = db.Column(db.Text, nullable=True)
+
+class RapportAnalyse(db.Model):
+    __tablename__ = 'rapport_analyse'
+    id = db.Column(db.Integer, primary_key=True)
+    entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
+    titre = db.Column(db.String(200), nullable=False)
+    contenu = db.Column(db.Text, nullable=False)
+    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
+    createur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=False)
+    type_rapport = db.Column(db.String(50), nullable=False)
+    periode_debut = db.Column(db.Date, nullable=True)
+    periode_fin = db.Column(db.Date, nullable=True)
+    metrics = db.Column(db.JSON, nullable=True)
 
 # Organisation
 
@@ -190,10 +261,29 @@ class EntrepriseReglementation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     entreprise_id = db.Column(db.Integer, db.ForeignKey('entreprise.id'), nullable=False)
     reglementation_id = db.Column(db.Integer, db.ForeignKey('reglementation.id'), nullable=False)
-    suivi = db.Column(db.Boolean, default=True, nullable=False)  # Permet de savoir si l'entreprise suit cette réglementation
+    suivi = db.Column(db.Boolean, default=True, nullable=False)  # Permet de suivre ou non une réglementation
     score = db.Column(db.Integer, default=0, nullable=True)
-
+    
+    # Risk assessment fields
+    niveau_risque = db.Column(db.Enum(SeveriteEnum), nullable=True)
+    impact_financier = db.Column(db.Float, nullable=True)
+    probabilite = db.Column(db.Integer, nullable=True)  # Scale of 1-10
+    date_derniere_evaluation = db.Column(db.DateTime, nullable=True)
+    
+    # Monitoring fields
+    frequence_revision = db.Column(db.Integer, nullable=True)  # Days between revisions
+    prochaine_revision = db.Column(db.DateTime, nullable=True)
+    responsable_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=True)
+    
+    # Additional metadata
+    date_ajout = db.Column(db.DateTime, default=datetime.utcnow)
+    commentaires = db.Column(db.Text, nullable=True)
+    statut_implementation = db.Column(db.String(50), nullable=True)
+    
+    # Relationships
     reglementation = db.relationship('Reglementation', backref='entreprises_associees')
+    responsable = db.relationship('User', backref='reglementations_supervisees')
+    historique_evaluations = db.relationship('HistoriqueEvaluation', backref='entreprise_reglementation', lazy=True)
 
 
     def mettre_a_jour_score(self):

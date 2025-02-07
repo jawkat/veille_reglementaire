@@ -11,10 +11,20 @@ from wtforms.validators import DataRequired, Length, Email
 
 from flask_login import login_required, current_user
 from app.routes.admin import role_required
+import logging
 
 bp = Blueprint('reglement', __name__)
 
+# Refactor repeated logic into helper functions
+def check_existing_entry(model, field, value, message):
+    existing_entry = model.query.filter(field == value).first()
+    if existing_entry:
+        flash(message, "danger")
+        return True
+    return False
 
+def log_error(message):
+    logging.error(message)
 
 class SecteurForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=100)])
@@ -26,30 +36,30 @@ class SecteurForm(FlaskForm):
 def ajouter_secteur():
     form = SecteurForm()
     if form.validate_on_submit():
-        # Vérifier si le secteur existe déjà
-        secteur_existant = Secteur.query.filter_by(nom=form.nom.data).first()
-        if secteur_existant:
-            flash("Un secteur avec ce nom existe déjà.", "danger")
-            return redirect(url_for('reglement.ajouter_secteur'))
+        if check_existing_entry(Secteur, Secteur.nom, form.nom.data, "Un secteur avec ce nom existe déjà."):
+            return jsonify(success=False, message="Un secteur avec ce nom existe déjà.")
 
-        # Créer un nouveau secteur
-        nouveau_secteur = Secteur(
-            nom=form.nom.data,
-            description=form.description.data
-        )
+        nouveau_secteur = Secteur(nom=form.nom.data, description=form.description.data)
         db.session.add(nouveau_secteur)
         db.session.commit()
-        flash("Secteur créé avec succès !", "success")
-        return redirect(url_for('reglement.liste_secteurs'))
+        return jsonify(success=True, message="Secteur ajouté avec succès.")
 
     return render_template('secteur/ajouter_secteur.html', form=form)
 
 @bp.route('/secteurs', methods=['GET'])
+@login_required
+@role_required('ADMIN')
 def liste_secteurs():
-    secteurs = Secteur.query.all()
-    return render_template('secteur/liste_secteurs.html', secteurs=secteurs)
+    try:
+        secteurs = Secteur.query.all()
+        return render_template('secteur/liste_secteurs.html', secteurs=secteurs)
+    except Exception as e:
+        log_error(f"Erreur lors de la récupération des secteurs : {str(e)}")
+        flash(f"Erreur lors de la récupération des secteurs : {str(e)}", "danger")
+        return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
 
-#**********************************************************************************************
+
+# **********************************************************************************************
 
 class DomaineForm(FlaskForm):
     nom = StringField('Nom du Domaine', validators=[DataRequired()])
@@ -61,30 +71,31 @@ class DomaineForm(FlaskForm):
 def ajouter_domaine():
     form = DomaineForm()
     if form.validate_on_submit():
+        if check_existing_entry(Domaine, Domaine.nom, form.nom.data, "Un domaine avec ce nom existe déjà."):
+            return jsonify(success=False, message="Un domaine avec ce nom existe déjà.")
 
-        # Vérifier si le domaine existe déjà
-        domaine_existant = Domaine.query.filter_by(nom=form.nom.data).first()
-        if domaine_existant:
-            flash("Un domaine avec ce nom existe déjà.", "danger")
-            return redirect(url_for('reglement.ajouter_domaine'))
-
-        # Créer un nouveau secteur
         nouveau_domaine = Domaine(nom=form.nom.data, description=form.description.data)
         db.session.add(nouveau_domaine)
         db.session.commit()
-        flash('Domaine ajouté avec succès.', 'success')
-        return redirect(url_for('reglement.liste_domaines'))
+        return jsonify(success=True, message="Domaine ajouté avec succès.")
+
     return render_template('domaine/ajouter_domaine.html', form=form)
 
 
 @bp.route('/domaines', methods=['GET'])
+@login_required
+@role_required('ADMIN')
 def liste_domaines():
-    domaines = Domaine.query.all()
-    return render_template('domaine/liste_domaines.html', domaines=domaines)
+    try:
+        domaines = Domaine.query.all()
+        return render_template('domaine/liste_domaines.html', domaines=domaines)
+    except Exception as e:
+        log_error(f"Erreur lors de la récupération des domaines : {str(e)}")
+        flash(f"Erreur lors de la récupération des domaines : {str(e)}", "danger")
+        return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
 
 
 # *************************************************************************
-
 
 class SousDomaineForm(FlaskForm):
     nom = StringField('Nom du Sous-Domaine', validators=[DataRequired()])
@@ -97,6 +108,9 @@ def ajouter_sous_domaine():
     form = SousDomaineForm()
     form.domaine_id.choices = [(d.id, d.nom) for d in Domaine.query.all()]
     if form.validate_on_submit():
+        if check_existing_entry(SousDomaine, SousDomaine.nom, form.nom.data, "Un sous-domaine avec ce nom existe déjà."):
+            return jsonify(success=False, message="Un sous-domaine avec ce nom existe déjà.")
+
         sous_domaine = SousDomaine(
             nom=form.nom.data,
             description=form.description.data,
@@ -104,14 +118,21 @@ def ajouter_sous_domaine():
         )
         db.session.add(sous_domaine)
         db.session.commit()
-        flash('Sous-domaine ajouté avec succès.', 'success')
-        return redirect(url_for('reglement.liste_sous_domaines'))
+        return jsonify(success=True, message="Sous-domaine ajouté avec succès.")
+
     return render_template('domaine/ajouter_sous_domaine.html', form=form)
 
 @bp.route('/sous-domaines', methods=['GET'])
+@login_required
+@role_required('ADMIN')
 def liste_sous_domaines():
-    sous_domaines = SousDomaine.query.all()
-    return render_template('domaine/liste_sous_domaines.html', sous_domaines=sous_domaines)
+    try:
+        sous_domaines = SousDomaine.query.all()
+        return render_template('domaine/liste_sous_domaines.html', sous_domaines=sous_domaines)
+    except Exception as e:
+        log_error(f"Erreur lors de la récupération des sous-domaines : {str(e)}")
+        flash(f"Erreur lors de la récupération des sous-domaines : {str(e)}", "danger")
+        return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
 
 
 class ReglementationForm(FlaskForm):
@@ -165,11 +186,8 @@ def ajouter_reglementation():
     if form.validate_on_submit():
 
         # Vérifier si le titre existe déjà
-        titre_existant = Reglementation.query.filter_by(titre=form.titre.data).first()
-        if titre_existant:
-            flash("Une réglementation avec ce titre existe déjà. Veuillez en choisir un autre.", "danger")
-            return render_template('reglementations/ajouter_reglementation.html', form=form, domaines=domaines,
-                                    secteurs=secteurs, selected_secteurs=form.secteurs.data)
+        if check_existing_entry(Reglementation, Reglementation.titre, form.titre.data, "Une réglementation avec ce titre existe déjà."):
+            return jsonify(success=False, message="Une réglementation avec ce titre existe déjà.")
 
         submitted_sous_domaine = form.sous_domaine_id.data
         valid_choices = [choice[0] for choice in form.sous_domaine_id.choices]
@@ -228,12 +246,15 @@ def get_sous_domaines(domaine_id):
         sous_domaines_data = [{'id': s.id, 'nom': s.nom} for s in sous_domaines]
         return jsonify(sous_domaines_data)
     except Exception as e:
+        log_error(f"Erreur lors du chargement des sous-domaines : {str(e)}")
         return jsonify({'error': f"Erreur lors du chargement des sous-domaines : {str(e)}"}), 500
 
 
 
 
 @bp.route('/liste-reglementations', methods=['GET'])
+@login_required
+@role_required('ADMIN')
 def liste_reglementations():
     try:
         # Récupérer toutes les réglementations
@@ -252,12 +273,15 @@ def liste_reglementations():
 
         return render_template('reglementations/liste_reglementations.html', reglementations=reglementations, suivi_map=suivi_map)
     except Exception as e:
+        log_error(f"Erreur lors de la récupération des réglementations : {str(e)}")
         flash(f"Erreur lors de la récupération des réglementations : {str(e)}", "danger")
         return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
 
 
 
 @bp.route('/reglementation/<int:id>', methods=['GET'])
+@login_required
+@role_required('ADMIN')
 def detail_reglementation(id):
     reglementation = Reglementation.query.get_or_404(id)
 
@@ -307,6 +331,7 @@ def ajouter_theme():
         }), 200
     except Exception as e:
         db.session.rollback()
+        log_error(f"Erreur lors de l'ajout du thème : {str(e)}")
         return jsonify({'status': 'error', 'message': f"Erreur lors de l'ajout du thème : {str(e)}"}), 500
 
 
@@ -354,6 +379,8 @@ def ajouter_article(reglementation_id):
 
 
 @bp.route('/modifier-reglementation/<int:reglementation_id>', methods=['GET', 'POST'])
+@login_required
+@role_required('ADMIN')
 def modifier_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
     form = ReglementationForm(obj=reglementation)
@@ -389,6 +416,8 @@ def modifier_reglementation(reglementation_id):
 
 
 @bp.route('/supprimer-reglementation/<int:reglementation_id>', methods=['POST'])
+@login_required
+@role_required('ADMIN')
 def supprimer_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
 
