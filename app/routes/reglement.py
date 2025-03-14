@@ -273,8 +273,8 @@ def liste_reglementations():
 
         return render_template('reglementations/liste_reglementations.html', reglementations=reglementations, suivi_map=suivi_map)
     except Exception as e:
-        log_error(f"Erreur lors de la récupération des réglementations : {str(e)}")
-        flash(f"Erreur lors de la récupération des réglementations : {str(e)}", "danger")
+        log_error(f" jk Erreur lors de la récupération des réglementations : {str(e)}")
+        flash(f"jk Erreur lors de la récupération des réglementations : {str(e)}", "danger")
         return redirect(url_for('main.index'))  # Rediriger en cas d'erreur
 
 

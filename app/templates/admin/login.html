@@ -21,7 +21,7 @@ position: relative;
 
     /* Centered login container with transparency */
     .login-container {
-        max-width: 400px;
+        max-width: 800px;
         padding: 20px;
         background: rgba(255, 255, 255, 0.6); /* Light background with transparency */
         border-radius: 10px;
@@ -34,7 +34,7 @@ position: relative;
 
     /* Increase opacity on hover */
     .login-container:hover {
-        background: rgba(255, 255, 255, 1); /* Higher opacity on hover */
+        background: rgba(255, 255, 255, 0.7); /* Higher opacity on hover */
     }
 
     .logo {
@@ -60,10 +60,7 @@ position: relative;
         padding: 20px;
     }
 
-    .login-title:hover {
-        background: var(--nomai);
-        color: rgba(240, 248, 255);
-    }
+
 
     .form-control {
         border-radius: 5px;
@@ -78,23 +75,43 @@ position: relative;
     </div> -->
 
     <!-- Title -->
-    <h4 class="login-title">Veuillez Vous Connecter</h4>
+    <h4 class="login-title">Veuillez Vous Connecter à <span class="">VeillePro</span></h4>
 
     <!-- Login Form -->
-    <form method="POST" action="{{ url_for('admin.login') }}">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-          
-            {{ form.email(class_="form-control", placeholder="Email") }}
+
+    <div class="row">
+        <div class="col-md-6">
+            <p class="text-dark">
+                
+                Pour votre première connexion à votre compte abonné, utilisez
+                l’identifiant et le mot de passe que vous avez reçu dans le mail
+                “Activation de votre compte”
+                Vous pouvez réinitialiser votre mot de passe en cliquant sur le
+                lien  mot de passe oublié votre ?
+            </p>
         </div>
-        <div class="form-group">
-     
-            {{ form.password(class_="form-control", placeholder="Mot de passe") }}
+
+        <div class="col-md-6">
+            <form method="POST" action="{{ url_for('admin.login') }}"
+                class="bg-light p-3 rounded-3">
+                {{ form.hidden_tag() }}
+                <div class="form-group mb-3">
+                    {{ form.email(class_="form-control", placeholder="Email", style="border-radius: 5px;") }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.password(class_="form-control",
+                    placeholder="Mot de passe", style="border-radius: 5px;") }}
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary w-100"
+                        style="background-color: var(--accent-color); font-weight: bold; border-radius: 5px;">Se
+                        connecter</button>
+                </div>
+            </form>
+
         </div>
-        <div class="text-center mt-3">
-            <button type="submit" class="btn" style="width: 100%; background-color: var(--accent-color); font-weight: bold;">Se connecter</button>
-        </div>
-    </form>
+
+    </div>
 
     <!-- Additional Links -->
     <div class="text-center mt-3">
@@ -102,5 +119,5 @@ position: relative;
     </div>
 </div>
 
-
 {% endblock %}
+
