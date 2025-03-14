@@ -47,7 +47,6 @@ def ajouter_secteur():
     return render_template('secteur/ajouter_secteur.html', form=form)
 
 @bp.route('/secteurs', methods=['GET'])
-@login_required
 @role_required('ADMIN')
 def liste_secteurs():
     try:
@@ -83,7 +82,6 @@ def ajouter_domaine():
 
 
 @bp.route('/domaines', methods=['GET'])
-@login_required
 @role_required('ADMIN')
 def liste_domaines():
     try:
@@ -123,7 +121,6 @@ def ajouter_sous_domaine():
     return render_template('domaine/ajouter_sous_domaine.html', form=form)
 
 @bp.route('/sous-domaines', methods=['GET'])
-@login_required
 @role_required('ADMIN')
 def liste_sous_domaines():
     try:
@@ -253,7 +250,6 @@ def get_sous_domaines(domaine_id):
 
 
 @bp.route('/liste-reglementations', methods=['GET'])
-@login_required
 def liste_reglementations():
     try:
         # Récupérer toutes les réglementations
@@ -279,7 +275,6 @@ def liste_reglementations():
 
 
 @bp.route('/reglementation/<int:id>', methods=['GET'])
-@login_required
 @role_required('ADMIN','MANAGER')
 def detail_reglementation(id):
     reglementation = Reglementation.query.get_or_404(id)
@@ -378,7 +373,6 @@ def ajouter_article(reglementation_id):
 
 
 @bp.route('/modifier-reglementation/<int:reglementation_id>', methods=['GET', 'POST'])
-@login_required
 @role_required('ADMIN','MANAGER')
 def modifier_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
@@ -415,7 +409,6 @@ def modifier_reglementation(reglementation_id):
 
 
 @bp.route('/supprimer-reglementation/<int:reglementation_id>', methods=['POST'])
-@login_required
 @role_required('ADMIN')
 def supprimer_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
