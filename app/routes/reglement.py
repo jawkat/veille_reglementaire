@@ -275,7 +275,6 @@ def liste_reglementations():
 
 
 @bp.route('/reglementation/<int:id>', methods=['GET'])
-@role_required('ADMIN','MANAGER')
 def detail_reglementation(id):
     reglementation = Reglementation.query.get_or_404(id)
 
@@ -304,7 +303,6 @@ def detail_reglementation(id):
 
 
 @bp.route('/ajouter-theme', methods=['POST'])
-@role_required(['ADMIN'])
 def ajouter_theme():
     try:
         data = request.get_json()
@@ -342,7 +340,6 @@ class ArticleForm(FlaskForm):
 
 
 @bp.route('/ajouter-article/<int:reglementation_id>', methods=['GET', 'POST'])
-@role_required(['ADMIN'])
 def ajouter_article(reglementation_id):
     # Récupérer la réglementation pour afficher ses informations dans le formulaire
     reglementation = Reglementation.query.get_or_404(reglementation_id)
@@ -373,7 +370,6 @@ def ajouter_article(reglementation_id):
 
 
 @bp.route('/modifier-reglementation/<int:reglementation_id>', methods=['GET', 'POST'])
-@role_required('ADMIN','MANAGER')
 def modifier_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
     form = ReglementationForm(obj=reglementation)
@@ -409,7 +405,6 @@ def modifier_reglementation(reglementation_id):
 
 
 @bp.route('/supprimer-reglementation/<int:reglementation_id>', methods=['POST'])
-@role_required('ADMIN')
 def supprimer_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
 
