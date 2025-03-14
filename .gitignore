@@ -1,2 +1,19 @@
-*.pyc
+# Ignorer les fichiers de cache Python
 __pycache__/
+*.pyc
+*.pyo
+
+# Ignorer les fichiers de log
+*.log
+
+# Ignorer les fichiers temporaires
+*.swp
+*.bak
+*.tmp
+
+# Ignorer les fichiers de sortie de nohup
+nohup.out
+
+# Ignorer la base de données SQLite
+*.db
+
