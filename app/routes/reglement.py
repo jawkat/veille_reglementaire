@@ -254,7 +254,6 @@ def get_sous_domaines(domaine_id):
 
 @bp.route('/liste-reglementations', methods=['GET'])
 @login_required
-@role_required('ADMIN')
 def liste_reglementations():
     try:
         # Récupérer toutes les réglementations
