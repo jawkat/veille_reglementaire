@@ -280,7 +280,7 @@ def liste_reglementations():
 
 @bp.route('/reglementation/<int:id>', methods=['GET'])
 @login_required
-@role_required('ADMIN')
+@role_required('ADMIN','MANAGER')
 def detail_reglementation(id):
     reglementation = Reglementation.query.get_or_404(id)
 
@@ -379,7 +379,7 @@ def ajouter_article(reglementation_id):
 
 @bp.route('/modifier-reglementation/<int:reglementation_id>', methods=['GET', 'POST'])
 @login_required
-@role_required('ADMIN')
+@role_required('ADMIN','MANAGER')
 def modifier_reglementation(reglementation_id):
     reglementation = Reglementation.query.get_or_404(reglementation_id)
     form = ReglementationForm(obj=reglementation)
