@@ -232,7 +232,7 @@
 
             <hr class="mt-5">
             {% if current_user.is_authenticated and current_user.role.name == 'ADMIN' %}
-            <a href="{{ url_for('reglement.ajouter_article', reglementation_id=reglementation.id) }}"
+            <a href="{{ url_for('reglementation.ajouter_article', reglementation_id=reglementation.id) }}"
                 class="btn btn-success action-button float-end sticky-md-top">
                 Ajouter un Article
             </a>
@@ -331,7 +331,7 @@
         <div class="card-footer d-flex justify-content-between">
 
         
-            <a href="{{ url_for('reglement.liste_reglementations') }}" class="btn btn-secondary action-button">
+            <a href="{{ url_for('reglementation.liste_reglementations') }}" class="btn btn-secondary action-button">
                 <i class="fas fa-arrow-left me-2"></i>Retour à la liste
             </a>
         </div>

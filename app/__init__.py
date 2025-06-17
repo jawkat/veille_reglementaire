@@ -38,22 +38,29 @@ def create_app(config_class='config.Config'):
     from .routes.main import bp as main_bp
     from .routes.admin import bp as admin_bp
 
-    from .routes.reglement import bp as reglement_bp
+    from .routes.reglementation import bp as reglementation_bp
     from .routes.manager import bp as manager_bp
     from .routes.evaluation import bp as evaluation_bp
     from .routes.entreprise import bp as entreprise_bp
     from .routes.article import bp as article_bp
+    
+    from .routes.theme import bp as theme_bp
+    from .routes.domaine import bp as domaine_bp
+    from .routes.secteur import bp as secteur_bp
+    
 
 
 
 
     app.register_blueprint(main_bp)
     app.register_blueprint(admin_bp)
-    app.register_blueprint(reglement_bp)
+    app.register_blueprint(reglementation_bp)
     app.register_blueprint(manager_bp)
     app.register_blueprint(evaluation_bp)
     app.register_blueprint(entreprise_bp)
     app.register_blueprint(article_bp)
-
+    app.register_blueprint(theme_bp)
+    app.register_blueprint(domaine_bp)
+    app.register_blueprint(secteur_bp)
 
     return app

@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('reglementation.liste_reglementations') }}">Réglementations</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('reglementation.detail_reglementation', id=version.reglementation_id) }}">
+                            {{ version.reglementation.titre }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Version {{ version.version_numero }}</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">Version {{ version.version_numero }}</h2>
+                        <small class="text-muted">
+                            Créée le {{ version.date_creation.strftime('%d/%m/%Y à %H:%M') }}
+                        </small>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if version.modifications_detail %}
+                    <div class="mb-4">
+                        <h5>Détails des modifications</h5>
+                        <div class="border p-3 bg-light">
+                            {{ version.modifications_detail|nl2br }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div>
+                        <h5>Contenu</h5>
+                        <div class="border p-3">
+                            {{ version.contenu|safe }}
+                        </div>
+                    </div>
+                </div>
+                {% if current_user.role.value == 'admin' %}
+                <div class="card-footer">
+                    <div class="btn-group">
+                        <a href="{{ url_for('reglementation.modifier_version', version_id=version.id) }}" 
+                           class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                        <button onclick="confirmDelete()" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette version ?</p>
+                <p class="text-danger">
+                    <strong>Attention :</strong> Cette action est irréversible.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form action="{{ url_for('reglementation.supprimer_version', version_id=version.id) }}" 
+                      method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function confirmDelete() {
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+{% endblock %}

@@ -39,7 +39,7 @@ def modifier_article(article_id):
         db.session.commit()
 
         flash('Article modifié avec succès.', 'success')
-        return redirect(url_for('reglement.detail_reglementation', id=article.reglementation_id))
+        return redirect(url_for('reglementation.detail_reglementation', id=article.reglementation_id))
 
     return render_template('articles/modifier_article.html', form=form, article=article)
 
@@ -56,4 +56,4 @@ def supprimer_article(article_id):
     db.session.commit()
 
     flash('Article supprimé avec succès.', 'success')
-    return redirect(url_for('reglement.detail_reglementation', id=reglementation_id))
+    return redirect(url_for('reglementation.detail_reglementation', id=reglementation_id))

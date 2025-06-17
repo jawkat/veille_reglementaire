@@ -150,7 +150,7 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <h1 class="h3 mb-3 mb-md-0">Liste des Réglementations</h1>
                         <div class="d-flex gap-2">
-                            <a class="btn btn-success hover-effect" href="{{ url_for('reglement.ajouter_reglementation') }}">
+                            <a class="btn btn-success hover-effect" href="{{ url_for('reglementation.ajouter_reglementation') }}">
                                 <i class="fas fa-plus me-2"></i>Nouvelle Réglementation
                             </a>
                         </div>
@@ -181,7 +181,7 @@
                         </button>
                     </h5>
                 </div>
-                <div class="collapse show" id="filterCollapse">
+                <div class="collapse hide" id="filterCollapse">
                     <div class="card-body">
                         <div class="row g-3">
                             <!-- First Row -->
@@ -301,7 +301,7 @@
                     <span class="badge bg-secondary badge-custom">{{ reglementation.type_texte }}</span>
                 </td>
                 <td>
-                    <a href="{{ url_for('reglement.detail_reglementation', id=reglementation.id) }}" class="text-decoration-none">
+                    <a href="{{ url_for('reglementation.detail_reglementation', id=reglementation.id) }}" class="text-decoration-none">
                         {{ reglementation.titre }}
                     </a>
                 </td>
@@ -330,10 +330,10 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('reglement.modifier_reglementation', reglementation_id=reglementation.id) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ url_for('reglementation.modifier_reglementation', reglementation_id=reglementation.id) }}" class="btn btn-primary btn-sm">
                         Modifier
                     </a>
-                    <form action="{{ url_for('reglement.supprimer_reglementation', reglementation_id=reglementation.id) }}" method="POST" style="display: inline;">
+                    <form action="#" method="POST" style="display: inline;">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Voulez-vous vraiment supprimer cette réglementation ?')">
                             Supprimer
                         </button>

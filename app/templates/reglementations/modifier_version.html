@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Modifier la version</h2>
+                    <h6 class="text-muted">Réglementation : {{ version.reglementation.titre }}</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.csrf_token }}
+                        
+                        <div class="mb-3">
+                            {{ form.version_numero.label(class="form-label") }}
+                            {{ form.version_numero(class="form-control") }}
+                            {% if form.version_numero.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.version_numero.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Le numéro de version doit être unique pour cette réglementation.
+                            </small>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.modifications_detail.label(class="form-label") }}
+                            {{ form.modifications_detail(class="form-control", rows=3) }}
+                            {% if form.modifications_detail.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.modifications_detail.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.contenu.label(class="form-label") }}
+                            {{ form.contenu(class="form-control", rows=15) }}
+                            {% if form.contenu.errors %}
+                            <div class="invalid-feedback d-block">
+                                {% for error in form.contenu.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('reglementation.detail_reglementation', id=version.reglementation_id) }}" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            {{ form.submit(class="btn btn-primary", value="Modifier") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+<script>
+    ClassicEditor
+        .create(document.querySelector('#contenu'))
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+{% endblock %}

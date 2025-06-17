@@ -1,0 +1,233 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('reglementation.liste_reglementations') }}">Réglementations</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('reglementation.detail_reglementation', id=reglementation.id) }}">
+                            {{ reglementation.titre }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active">Évaluation</li>
+                </ol>
+            </nav>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">Évaluation de la réglementation</h2>
+                        <div>
+                            Score global : 
+                            <span class="badge bg-{{ 'success' if suivi.score >= 80 else 'warning' if suivi.score >= 50 else 'danger' }}">
+                                {{ suivi.score }}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Article</th>
+                                    <th>Applicable</th>
+                                    <th>Conformité</th>
+                                    <th>Dernière mise à jour</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evaluation in evaluations %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ evaluation.article.numero }}</strong><br>
+                                        <small>{{ evaluation.article.titre }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if evaluation.applicable.value == 'Oui' 
+                                                               else 'warning' if evaluation.applicable.value == 'Partiellement Applicable'
+                                                               else 'info' if evaluation.applicable.value == 'Information'
+                                                               else 'danger' if evaluation.applicable.value == 'Non'
+                                                               else 'secondary' }}">
+                                            {{ evaluation.applicable.value }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if evaluation.conforme.value == 'Conforme'
+                                                               else 'danger' if evaluation.conforme.value == 'Non conforme'
+                                                               else 'secondary' }}">
+                                            {{ evaluation.conforme.value }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {{ evaluation.date_derniere_maj.strftime('%d/%m/%Y') }}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-info" 
+                                                onclick="showArticleDetails('{{ evaluation.article.numero }}',
+                                                                          '{{ evaluation.article.titre }}',
+                                                                          `{{ evaluation.article.contenu }}`,
+                                                                          '{{ evaluation.applicable.value }}',
+                                                                          '{{ evaluation.conforme.value }}',
+                                                                          `{{ evaluation.champ_d_application or '' }}`,
+                                                                          `{{ evaluation.commentaires or '' }}`)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                                onclick="showEvaluationForm('{{ evaluation.id }}',
+                                                                         '{{ evaluation.applicable.value }}',
+                                                                         '{{ evaluation.conforme.value }}',
+                                                                         `{{ evaluation.champ_d_application or '' }}`,
+                                                                         `{{ evaluation.commentaires or '' }}`)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour afficher les détails de l'article -->
+<div class="modal fade" id="articleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="articleTitle"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <h6>Contenu de l'article :</h6>
+                    <div id="articleContent" class="border p-3 bg-light"></div>
+                </div>
+                <div class="mb-3">
+                    <h6>Évaluation :</h6>
+                    <p><strong>Applicable :</strong> <span id="articleApplicable"></span></p>
+                    <p><strong>Conformité :</strong> <span id="articleConformite"></span></p>
+                </div>
+                <div class="mb-3">
+                    <h6>Champ d'application :</h6>
+                    <div id="articleChampApplication" class="border p-3 bg-light"></div>
+                </div>
+                <div class="mb-3">
+                    <h6>Commentaires :</h6>
+                    <div id="articleCommentaires" class="border p-3 bg-light"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour le formulaire d'évaluation -->
+<div class="modal fade" id="evaluationModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier l'évaluation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="evaluationForm" method="POST">
+                    <input type="hidden" id="evaluationId" name="evaluation_id">
+                    
+                    <div class="mb-3">
+                        <label for="applicable" class="form-label">Applicable</label>
+                        <select class="form-select" id="applicable" name="applicable" required>
+                            <option value="OUI">Oui</option>
+                            <option value="NON">Non</option>
+                            <option value="PARTIEL">Partiellement Applicable</option>
+                            <option value="INFO">Information</option>
+                            <option value="NON_EVALUE">Non évalué</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="conforme" class="form-label">Conformité</label>
+                        <select class="form-select" id="conforme" name="conforme" required>
+                            <option value="CONFORME">Conforme</option>
+                            <option value="NON_CONFORME">Non conforme</option>
+                            <option value="NON_EVALUE">Non évalué</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="champ_application" class="form-label">Champ d'application</label>
+                        <textarea class="form-control" id="champ_application" name="champ_application" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="commentaires" class="form-label">Commentaires</label>
+                        <textarea class="form-control" id="commentaires" name="commentaires" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" onclick="submitEvaluation()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showArticleDetails(numero, titre, contenu, applicable, conforme, champApplication, commentaires) {
+    document.getElementById('articleTitle').textContent = `Article ${numero} - ${titre}`;
+    document.getElementById('articleContent').innerHTML = contenu;
+    document.getElementById('articleApplicable').textContent = applicable;
+    document.getElementById('articleConformite').textContent = conforme;
+    document.getElementById('articleChampApplication').innerHTML = champApplication || 'Non spécifié';
+    document.getElementById('articleCommentaires').innerHTML = commentaires || 'Aucun commentaire';
+    
+    new bootstrap.Modal(document.getElementById('articleModal')).show();
+}
+
+function showEvaluationForm(id, applicable, conforme, champApplication, commentaires) {
+    document.getElementById('evaluationId').value = id;
+    document.getElementById('applicable').value = applicable;
+    document.getElementById('conforme').value = conforme;
+    document.getElementById('champ_application').value = champApplication;
+    document.getElementById('commentaires').value = commentaires;
+    
+    new bootstrap.Modal(document.getElementById('evaluationModal')).show();
+}
+
+function submitEvaluation() {
+    const form = document.getElementById('evaluationForm');
+    const formData = new FormData(form);
+    
+    fetch(`/evaluation/${formData.get('evaluation_id')}/update`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert(data.message || 'Une erreur est survenue');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Une erreur est survenue');
+    });
+}
+</script>
+{% endblock %}
